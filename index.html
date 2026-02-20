@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
+<head>x
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -132,10 +132,10 @@ select{-webkit-appearance:none}::-webkit-scrollbar{width:0;height:0}
   <div class="lock-screen" id="scrSetupFB">
     <div style="font-size:52px;margin-bottom:14px">☁️</div>
     <h2>Configuration initiale</h2>
-    <p style="margin-bottom:14px">Connecte ton URL pour sécuriser le login</p>
+    <p style="margin-bottom:14px">Connecte ton Firebase pour sécuriser le login</p>
     <div class="setup-box">
-      <label class="flab">URL </label>
-      <input class="finp" id="setupFBUrl" placeholder="https://xxx-default.com">
+      <label class="flab">URL Firebase</label>
+      <input class="finp" id="setupFBUrl" placeholder="https://xxx-default-rtdb.firebaseio.com">
       <label class="flab">Code sync</label>
       <input class="finp" id="setupFBCode" placeholder="mon-code-secret">
     </div>
@@ -282,18 +282,26 @@ async function init(){
   const conf=getSyncConf();
   // Pull login hash from Firebase if not stored locally yet (new device)
   if(!getLocalLoginHash()&&conf.url&&conf.code){
-    try{const r=await fetch(conf.url.replace(/\/$/,'')+'/auth/'+encodeURIComponent(conf.code)+'.json');if(r.ok){const d=await r.json();if(d?.h){setLocalLoginHash(d.h);if(d.salt)localStorage.setItem('crm_login_salt',d.salt)}}}catch(e){}
+    try{const r=await fetch(conf.url.replace(/\/$/,'')+'/auth/'+encodeURIComponent(conf.code)+'.json');if(r.ok){const d=await r.json();if(d?.h&&d?.salt){setLocalLoginHash(d.h);localStorage.setItem('crm_login_salt',d.salt)}else if(d?.h&&!d?.salt){
+      // Old format without salt — delete and re-setup
+      try{await fetch(conf.url.replace(/\/$/,'')+'/auth/'+encodeURIComponent(conf.code)+'.json',{method:'DELETE'})}catch(e){}
+    }}}catch(e){}
   }
-  const hasV=!!getHash();const hasL=hasLogin();
+  const hasV=!!getHash();
+  // Clear stale login hash if no salt (old format)
+  if(getLocalLoginHash()&&!localStorage.getItem('crm_login_salt')){localStorage.removeItem(LHK)}
+  const hasL=hasLogin();
   if(hasL){
     // Login exists → always show login first
     pm='login';showScreen('scrLogin');focusEl('loginInp');
   } else if(hasV&&!hasL){
-    // Vault exists but no login hash → need Firebase to pull it
-    pm='sync_for_login';showScreen('scrSetupFB');focusEl('setupFBUrl');
-    // Pre-fill if config already exists
-    if(conf.url){const u=document.getElementById('setupFBUrl');if(u)u.value=conf.url}
-    if(conf.code){const c=document.getElementById('setupFBCode');if(c)c.value=conf.code}
+    if(conf.url&&conf.code){
+      // Firebase config exists but no login → create one
+      pm='setup_login';showScreen('scrSetupLogin');focusEl('sLoginInp');
+    } else {
+      // No Firebase config → need it first
+      pm='sync_for_login';showScreen('scrSetupFB');focusEl('setupFBUrl');
+    }
   } else {
     // No vault = new user
     if(conf.url&&conf.code){pm='setup_login';showScreen('scrSetupLogin');focusEl('sLoginInp')}
@@ -406,7 +414,8 @@ async function doSetupLogin(){
   if(pm==='setup_login_confirm'){
     if(v===setupLogin){
       await saveLoginToFB(v);
-      pm='setup_pw';showScreen('scrSetupPW');setupNumpad('numpad2');focusEl('sPWInp');
+      if(getHash()){pm='pw_unlock';showScreen('scrPW');setupNumpad('numpad');focusEl('pwInp')}
+      else{pm='setup_pw';showScreen('scrSetupPW');setupNumpad('numpad2');focusEl('sPWInp')}
     }else{document.getElementById('sLoginM').textContent='Ne correspond pas';document.getElementById('sLoginM').className='lock-msg err';document.getElementById('sLoginInp').value='';pm='setup_login';document.getElementById('sLoginT').textContent='Créer un identifiant';document.getElementById('sLoginS').textContent='Choisis un nom d\'utilisateur'}
   }else{
     setupLogin=v;pm='setup_login_confirm';
@@ -488,7 +497,7 @@ function rSettings(){const conf=getSyncConf(),hasSy=conf.url&&conf.code,hasTfa=!
       <button class="btn btn-r" id="loadLogs" style="width:100%;padding:10px;margin-bottom:8px;background:var(--r2);border:1px solid var(--r3)">📋 Charger le journal</button>
       <div id="logList" style="max-height:250px;overflow-y:auto"></div></div>
     <div class="sync-box"><div class="sync-title">☁️ Sync (chiffré)</div><div class="sync-status"><div class="sync-dot ${hasSy?(syncState==='synced'?'sync-on':'sync-off'):'sync-off'}"></div><span style="font-size:12px;color:var(--t2)">${sTxt}</span></div>
-      <div class="fg" style="margin-bottom:8px"><label class="flab">URL </label><input class="finp" id="syUrl" value="${E(conf.url||'')}" placeholder="https://xxx.firebaseio.com"></div>
+      <div class="fg" style="margin-bottom:8px"><label class="flab">URL Firebase</label><input class="finp" id="syUrl" value="${E(conf.url||'')}" placeholder="https://xxx.firebaseio.com"></div>
       <div class="fg" style="margin-bottom:8px"><label class="flab">Code sync</label><input class="finp" id="syCode" value="${E(conf.code||'')}" placeholder="code"></div>
       <div style="display:flex;gap:6px"><button class="btn btn-b" id="sySave" style="flex:1;padding:10px">💾</button>${hasSy?`<button class="btn btn-g" id="sySync" style="flex:1;padding:10px">🔄 Sync</button>`:''}</div></div>
     <button class="btn btn-s" id="impTg" style="width:100%;margin-top:10px;padding:10px">📱 Telegram</button>
