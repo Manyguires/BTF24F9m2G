@@ -200,11 +200,20 @@ textarea.finp{resize:vertical;min-height:80px;line-height:1.5}
 <div class="toast" id="toast"></div>
 <script>
 (function(){
-const LS='crm9',PK='crm_pin',LK='crm_lk';let db=null;
-function odb(){return new Promise((r,j)=>{const q=indexedDB.open('crm9',1);q.onupgradeneeded=e=>e.target.result.createObjectStore('d');q.onsuccess=e=>{db=e.target.result;r()};q.onerror=()=>j()})}
+const LS='crm_master',PK='crm_pin',LK='crm_lk';let db=null;
+const OLD_LS=['crm9','crm8','crm7','crm_v5','crm_ls_v5'];
+const OLD_IDB=['crm9','crm8','crm7','crm_db'];
+function odb(){return new Promise((r,j)=>{const q=indexedDB.open('crm_master',1);q.onupgradeneeded=e=>e.target.result.createObjectStore('d');q.onsuccess=e=>{db=e.target.result;r()};q.onerror=()=>j()})}
 function ig(k){return new Promise(r=>{if(!db)return r(null);const t=db.transaction('d','readonly'),q=t.objectStore('d').get(k);q.onsuccess=()=>r(q.result??null);q.onerror=()=>r(null)})}
 function ist(k,v){return new Promise(r=>{if(!db)return r();const t=db.transaction('d','readwrite');t.objectStore('d').put(v,k);t.oncomplete=()=>r();t.onerror=()=>r()})}
-async function ld(){try{await odb()}catch(e){}let d=null;try{d=await ig('c')}catch(e){}if(!d)try{const l=localStorage.getItem(LS);if(l)d=JSON.parse(l)}catch(e){}return Array.isArray(d)?d:[]}
+function tryOldIDB(name){return new Promise(r=>{try{const q=indexedDB.open(name,1);q.onupgradeneeded=e=>{e.target.transaction.abort()};q.onsuccess=e=>{const d=e.target.result;try{const t=d.transaction('d','readonly')||d.transaction('data','readonly');const s=t.objectStore(t.objectStoreNames[0]);const g=s.get('c')||s.get('contacts');g.onsuccess=()=>{d.close();r(g.result||null)};g.onerror=()=>{d.close();r(null)}}catch(err){d.close();r(null)}};q.onerror=()=>r(null)}catch(e){r(null)}})}
+async function ld(){try{await odb()}catch(e){}let d=null;
+try{d=await ig('c')}catch(e){}
+if(!d||!Array.isArray(d)||d.length===0){try{const l=localStorage.getItem(LS);if(l){const p=JSON.parse(l);if(Array.isArray(p)&&p.length>0)d=p}}catch(e){}}
+if(!d||!Array.isArray(d)||d.length===0){for(const k of OLD_LS){try{const l=localStorage.getItem(k);if(l){const p=JSON.parse(l);if(Array.isArray(p)&&p.length>0){d=p;break}}}catch(e){}}}
+if(!d||!Array.isArray(d)||d.length===0){for(const name of OLD_IDB){const r=await tryOldIDB(name);if(Array.isArray(r)&&r.length>0){d=r;break}}}
+if(Array.isArray(d)&&d.length>0){await sv(d)}
+return Array.isArray(d)?d:[]}
 async function sv(a){try{localStorage.setItem(LS,JSON.stringify(a))}catch(e){}try{await ist('c',a)}catch(e){}}
 function gp(){return localStorage.getItem(PK)}function spp(p){localStorage.setItem(PK,p)}function isLk(){return localStorage.getItem(LK)==='1'}function sL(v){localStorage.setItem(LK,v?'1':'0')}
 
