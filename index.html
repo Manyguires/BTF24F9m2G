@@ -11,31 +11,34 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{--bg:#0b0e14;--bg2:#111820;--bg3:#182028;--bg4:#1f2a34;--bg5:#263240;--border:#1c2733;--border2:#2a3a4a;--t1:#f0f2f5;--t2:#c4ccd6;--t3:#7e8d9e;--t4:#4e5d6e;--g:#2ecc71;--g2:#27ae60;--g3:rgba(46,204,113,0.10);--g4:rgba(46,204,113,0.20);--y:#f1c40f;--y2:rgba(241,196,15,0.12);--r:#e74c3c;--r2:rgba(231,76,60,0.10);--r3:rgba(231,76,60,0.20);--b:#3498db;--b2:rgba(52,152,219,0.12);--o:#e67e22;--o2:rgba(230,126,34,0.12);--p:#9b59b6;--p2:rgba(155,89,182,0.12);--st:env(safe-area-inset-top);--sb:env(safe-area-inset-bottom)}
+:root{--bg:#0b0e14;--bg2:#111820;--bg3:#182028;--bg4:#1f2a34;--bg5:#263240;--border:#1c2733;--border2:#2a3a4a;--t1:#f0f2f5;--t2:#c4ccd6;--t3:#7e8d9e;--t4:#4e5d6e;--g:#2ecc71;--g2:#27ae60;--g3:rgba(46,204,113,0.10);--g4:rgba(46,204,113,0.20);--y:#f1c40f;--y2:rgba(241,196,15,0.12);--r:#e74c3c;--r2:rgba(231,76,60,0.10);--r3:rgba(231,76,60,0.20);--b:#3498db;--b2:rgba(52,152,219,0.12);--o:#e67e22;--o2:rgba(230,126,34,0.12);--p:#9b59b6;--p2:rgba(155,89,182,0.12);--st:env(safe-area-inset-top);--sb:env(safe-area-inset-bottom);--mw:600px}
 html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t2);font-family:'Inter',sans-serif;font-size:14px}
 input,textarea,select,button{font-family:inherit;font-size:inherit}
 input:focus,textarea:focus,select:focus{outline:none;border-color:var(--g)!important;box-shadow:0 0 0 3px var(--g3)!important}
 input::placeholder,textarea::placeholder{color:var(--t4)}
 select{-webkit-appearance:none}::-webkit-scrollbar{width:0;height:0}
+.shell{max-width:var(--mw);margin:0 auto;height:100%;display:flex;flex-direction:column;position:relative}
+@media(min-width:601px){.shell{border-left:1px solid var(--border);border-right:1px solid var(--border)}}
 /* LOCK */
-.lock{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:200;padding:20px;transition:opacity .3s}.lock.out{opacity:0;pointer-events:none}
+.lock{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:200;transition:opacity .3s}.lock.out{opacity:0;pointer-events:none}
+.lock-inner{display:flex;flex-direction:column;align-items:center;max-width:320px;width:100%;padding:20px}
+.lock-screen{display:none;flex-direction:column;align-items:center;text-align:center;width:100%}.lock-screen.show{display:flex}
 .lock h2{font-size:18px;font-weight:700;color:var(--t1);margin-bottom:4px}.lock p{font-size:13px;color:var(--t3);margin-bottom:20px;text-align:center}
-.lock-screen{display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;width:100%}.lock-screen.show{display:flex}
-.lk-inp{width:250px;background:var(--bg2);border:2px solid var(--border);border-radius:14px;padding:14px 16px;color:var(--t1);font-size:15px;font-weight:600;font-family:'JetBrains Mono',monospace;text-align:center;margin-bottom:14px}
+.lk-inp{width:100%;max-width:260px;background:var(--bg2);border:2px solid var(--border);border-radius:14px;padding:14px 16px;color:var(--t1);font-size:15px;font-weight:600;font-family:'JetBrains Mono',monospace;text-align:center;margin-bottom:14px}
 .lk-inp.masked{-webkit-text-security:disc;letter-spacing:3px;font-size:18px;padding-right:50px}
-.pw-wrap{position:relative;width:250px;margin-bottom:14px}
+.pw-wrap{position:relative;width:100%;max-width:260px;margin-bottom:14px}
+.pw-wrap .lk-inp{width:100%;margin-bottom:0}
 .pw-cnt{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:9px;font-family:'JetBrains Mono',monospace;pointer-events:none;padding:2px 5px;border-radius:4px}.pw-cnt.ok{color:var(--g);background:var(--g3)}.pw-cnt.no{color:var(--r);background:var(--r2)}
 .numpad{display:grid;grid-template-columns:repeat(3,68px);gap:8px;margin-bottom:14px}
-.nk{width:68px;height:52px;border-radius:12px;border:1px solid var(--border);background:var(--bg2);color:var(--t1);font-size:22px;font-weight:600;display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-user-select:none}.nk:active{background:var(--g3)}
-.lock-msg{font-size:12px;min-height:18px;margin-bottom:8px}.lock-msg.err{color:var(--r)}.lock-msg.warn{color:var(--o)}
+.nk{width:68px;height:52px;border-radius:12px;border:1px solid var(--border);background:var(--bg2);color:var(--t1);font-size:22px;font-weight:600;display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-user-select:none;transition:background .1s}.nk:active{background:var(--g3)}
+.lock-msg{font-size:12px;min-height:18px;margin-bottom:8px}.lock-msg.err{color:var(--r)}
 .lock-timer{color:var(--r);font-size:13px;font-weight:700;font-family:'JetBrains Mono',monospace;margin-bottom:10px}
 /* TOTP */
 .totp-input{width:200px;text-align:center;font-size:28px;font-weight:800;letter-spacing:12px;font-family:'JetBrains Mono',monospace;background:var(--bg2);border:2px solid var(--border);border-radius:14px;padding:14px;color:var(--t1);margin:14px 0}
 .totp-timer{font-size:12px;color:var(--t3);margin-bottom:10px}.totp-timer span{color:var(--y);font-weight:700;font-family:'JetBrains Mono',monospace}
 .totp-bar{width:200px;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;margin-bottom:16px}.totp-bar-fill{height:100%;background:var(--g);transition:width 1s linear;border-radius:2px}
 .totp-err{color:var(--r);font-size:12px;min-height:18px;margin-bottom:6px}
-/* Setup Firebase */
-.setup-box{width:280px;text-align:left;margin-bottom:14px}
+.setup-box{width:100%;max-width:280px;text-align:left;margin-bottom:14px}
 .setup-box .flab{font-size:11px;font-weight:600;color:var(--t3);margin-bottom:4px;display:block}
 .setup-box .finp{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--t1);font-size:13px;margin-bottom:10px}
 /* APP */
@@ -50,12 +53,12 @@ select{-webkit-appearance:none}::-webkit-scrollbar{width:0;height:0}
 .vw{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}.anim{animation:fu .2s ease}
 @keyframes fu{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}.shake{animation:shake .3s}
-.btn{border:none;border-radius:10px;padding:8px 16px;font-weight:700;cursor:pointer;font-size:13px}.btn:active{opacity:.7}
+.btn{border:none;border-radius:10px;padding:8px 16px;font-weight:700;cursor:pointer;font-size:13px;transition:opacity .1s}.btn:active{opacity:.7}
 .btn-g{background:var(--g);color:#fff;box-shadow:0 2px 10px rgba(46,204,113,0.2)}.btn-o{background:transparent;border:1px solid var(--border);color:var(--t3)}.btn-r{background:var(--r2);color:var(--r);border:1px solid var(--r3)}.btn-s{background:var(--g3);color:var(--g);border:1px solid var(--g4)}.btn-b{background:var(--b2);color:var(--b);border:1px solid rgba(52,152,219,0.2)}
 .sbar{padding:10px 16px 6px}.sinp{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:10px 14px;color:var(--t1);font-size:13px}
 .flts{display:flex;gap:6px;padding:2px 16px 8px}.fsel{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:5px 8px;color:var(--t3);font-size:11px}
 .clist{padding:2px 8px 20px}.empty{text-align:center;padding:50px 20px;color:var(--t3)}.empty .ei{font-size:40px;margin-bottom:10px}
-.cc{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:12px;cursor:pointer;margin-bottom:2px;-webkit-user-select:none}.cc:active{background:var(--g3)}
+.cc{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:12px;cursor:pointer;margin-bottom:2px;-webkit-user-select:none;transition:background .1s}.cc:hover{background:var(--bg3)}.cc:active{background:var(--g3)}
 .av{width:40px;height:40px;border-radius:50%;background:linear-gradient(140deg,var(--bg3),var(--bg5));display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:var(--g);flex-shrink:0;border:1px solid var(--border)}.av.lg{width:56px;height:56px;font-size:23px;background:linear-gradient(140deg,var(--g),var(--g2));color:#fff;border:none;box-shadow:0 4px 14px rgba(46,204,113,0.3)}
 .ci{flex:1;min-width:0}.cn{font-size:13px;font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cs{font-size:11px;color:var(--t4);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cc-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0}
@@ -89,9 +92,7 @@ select{-webkit-appearance:none}::-webkit-scrollbar{width:0;height:0}
 .dash-section{margin-bottom:14px}.dash-section h3{font-size:11px;font-weight:700;color:var(--g);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
 .top-item{display:flex;align-items:center;gap:8px;padding:10px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin-bottom:5px}.top-rank{font-size:13px;font-weight:800;color:var(--g);font-family:'JetBrains Mono',monospace;width:22px}.top-info{flex:1;min-width:0}.top-name{font-size:12px;font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.top-sub{font-size:10px;color:var(--t4)}
 .sov{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:50;display:flex;align-items:flex-end;justify-content:center}.sov.hide{display:none}
-.span{background:var(--bg);border:1px solid var(--border);border-radius:22px 22px 0 0;width:100%;max-width:500px;max-height:85vh;overflow-y:auto;padding:20px 20px calc(20px + var(--sb))}.shandle{width:36px;height:4px;border-radius:2px;background:var(--bg4);margin:0 auto 16px}
-.si{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)}
-.tog{width:44px;height:26px;border-radius:13px;background:var(--bg4);cursor:pointer;position:relative;transition:background .2s;flex-shrink:0}.tog.on{background:var(--g)}.togk{width:22px;height:22px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:transform .2s}.tog.on .togk{transform:translateX(18px)}
+.span{background:var(--bg);border:1px solid var(--border);border-radius:22px 22px 0 0;width:100%;max-width:var(--mw);max-height:85vh;overflow-y:auto;padding:20px 20px calc(20px + var(--sb))}.shandle{width:36px;height:4px;border-radius:2px;background:var(--bg4);margin:0 auto 16px}
 .imp-modal{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:60;display:flex;align-items:center;justify-content:center;padding:20px}.imp-modal.hide{display:none}.imp-box{background:var(--bg);border:1px solid var(--border);border-radius:18px;padding:20px;width:100%;max-width:400px;max-height:80vh;overflow-y:auto}
 .imp-list{max-height:280px;overflow-y:auto;margin:10px 0}.imp-item{display:flex;align-items:center;gap:10px;padding:9px;border-radius:10px;border:1px solid var(--border);margin-bottom:5px;cursor:pointer;-webkit-user-select:none}.imp-item.sel{border-color:var(--g);background:var(--g3)}.imp-check{width:18px;height:18px;border-radius:5px;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;color:transparent}.imp-item.sel .imp-check{border-color:var(--g);background:var(--g);color:#fff}
 .sec-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:10px}.sec-box-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
@@ -106,398 +107,203 @@ select{-webkit-appearance:none}::-webkit-scrollbar{width:0;height:0}
 </style>
 </head>
 <body>
-<div class="lock" id="lock">
-  <!-- LOGIN -->
-  <div class="lock-screen" id="scrLogin">
-    <div style="font-size:52px;margin-bottom:18px">📱</div>
-    <h2 id="loginT">Connexion</h2>
-    <p id="loginS">Identifiez-vous</p>
-    <input class="lk-inp" id="loginInp" type="text" autocomplete="off" autocapitalize="off" placeholder="Identifiant">
-    <div class="lock-msg" id="loginM"></div>
-    <div class="lock-timer" id="loginTimer" style="display:none"></div>
-    <button class="btn btn-g" id="loginBtn" style="padding:10px 30px">Suivant</button>
-  </div>
-  <!-- PASSWORD -->
-  <div class="lock-screen" id="scrPW">
-    <div style="font-size:52px;margin-bottom:18px">📱</div>
-    <h2 id="pwT">Entrer le code</h2>
-    <p id="pwS">Accès protégé</p>
-    <div class="pw-wrap"><input class="lk-inp masked" id="pwInp" type="password" autocomplete="off" placeholder="Code d'accès"><div class="pw-cnt no" id="pwCnt">0</div></div>
-    <div class="numpad" id="numpad"></div>
-    <div class="lock-msg" id="pwM"></div>
-    <button class="btn btn-g" id="pwBtn" style="padding:10px 30px">OK</button>
-    <button class="btn btn-o" id="pwSkip" style="margin-top:10px;padding:8px 20px;display:none;font-size:11px">Code oublié</button>
-  </div>
-  <!-- SETUP FIREBASE -->
-  <div class="lock-screen" id="scrSetupFB">
-    <div style="font-size:52px;margin-bottom:14px">☁️</div>
-    <h2>Configuration initiale</h2>
-    <p style="margin-bottom:14px">Connecte ton Firebase pour sécuriser le login</p>
-    <div class="setup-box">
-      <label class="flab">URL Firebase</label>
-      <input class="finp" id="setupFBUrl" placeholder="https://xxx-default-rtdb.firebaseio.com">
-      <label class="flab">Code sync</label>
-      <input class="finp" id="setupFBCode" placeholder="mon-code-secret">
-    </div>
-    <div class="lock-msg" id="setupFBM"></div>
-    <button class="btn btn-g" id="setupFBBtn" style="padding:10px 30px">Suivant</button>
-    <button class="btn btn-o" id="setupFBSkip" style="margin-top:10px;padding:8px 16px;font-size:11px">Passer (configurer plus tard)</button>
-  </div>
-  <!-- SETUP LOGIN -->
-  <div class="lock-screen" id="scrSetupLogin">
-    <div style="font-size:52px;margin-bottom:14px">👤</div>
-    <h2 id="sLoginT">Créer un identifiant</h2>
-    <p id="sLoginS">Choisis un nom d'utilisateur</p>
-    <input class="lk-inp" id="sLoginInp" type="text" autocomplete="off" autocapitalize="off" placeholder="Identifiant">
-    <div class="lock-msg" id="sLoginM"></div>
-    <button class="btn btn-g" id="sLoginBtn" style="padding:10px 30px">Suivant</button>
-  </div>
-  <!-- SETUP/UNLOCK PASSWORD -->
-  <div class="lock-screen" id="scrSetupPW">
-    <div style="font-size:52px;margin-bottom:14px">🔢</div>
-    <h2 id="sPWT">Créer un code</h2>
-    <p id="sPWS">Choisis un code d'accès</p>
-    <div class="pw-wrap"><input class="lk-inp masked" id="sPWInp" type="password" autocomplete="off" placeholder="Code d'accès"><div class="pw-cnt no" id="sPWCnt">0</div></div>
-    <div class="numpad" id="numpad2"></div>
-    <div class="lock-msg" id="sPWM"></div>
-    <button class="btn btn-g" id="sPWBtn" style="padding:10px 30px">Suivant</button>
-  </div>
-  <!-- TOTP -->
-  <div class="lock-screen" id="scrTOTP">
-    <div style="font-size:52px;margin-bottom:14px">🔑</div>
-    <h2 style="color:var(--t1)">2FA</h2>
-    <p style="color:var(--t3);font-size:12px;margin-bottom:6px">Code Google Authenticator</p>
-    <div class="totp-bar"><div class="totp-bar-fill" id="totpBar"></div></div>
-    <div class="totp-timer">Expire dans <span id="totpTime">30</span>s</div>
-    <input class="totp-input" id="totpInp" type="tel" maxlength="6" placeholder="000000" inputmode="numeric">
-    <div class="totp-err" id="totpErr"></div>
-    <button class="btn btn-g" id="totpBtn" style="padding:10px 30px">Vérifier</button>
-  </div>
-</div>
-<div id="app"></div>
+<div class="lock" id="lock"><div class="lock-inner">
+  <div class="lock-screen" id="scrLogin"><div style="font-size:52px;margin-bottom:18px">📱</div><h2>Connexion</h2><p>Identifiez-vous</p><input class="lk-inp" id="loginInp" type="text" autocomplete="off" autocapitalize="off" placeholder="Identifiant"><div class="lock-msg" id="loginM"></div><div class="lock-timer" id="loginTimer" style="display:none"></div><button class="btn btn-g" id="loginBtn" style="padding:10px 30px">Suivant</button></div>
+  <div class="lock-screen" id="scrPW"><div style="font-size:52px;margin-bottom:18px">📱</div><h2 id="pwT">Entrer le code</h2><p id="pwS">Accès protégé</p><div class="pw-wrap"><input class="lk-inp masked" id="pwInp" type="password" autocomplete="off" placeholder="Code d'accès"><div class="pw-cnt no" id="pwCnt">0</div></div><div class="numpad" id="numpad"></div><div class="lock-msg" id="pwM"></div><button class="btn btn-g" id="pwBtn" style="padding:10px 30px">OK</button><button class="btn btn-o" id="pwSkip" style="margin-top:10px;padding:8px 20px;display:none;font-size:11px">Code oublié</button></div>
+  <div class="lock-screen" id="scrSetupFB"><div style="font-size:52px;margin-bottom:14px">☁️</div><h2>Configuration</h2><p style="margin-bottom:14px">Connecte ton URL</p><div class="setup-box"><label class="flab">URL </label><input class="finp" id="setupFBUrl" placeholder="https://xxx-default-rtdb.com"><label class="flab">Code sync</label><input class="finp" id="setupFBCode" placeholder="mon-code-secret"></div><div class="lock-msg" id="setupFBM"></div><button class="btn btn-g" id="setupFBBtn" style="padding:10px 30px">Suivant</button><button class="btn btn-o" id="setupFBSkip" style="margin-top:10px;padding:8px 16px;font-size:11px">Passer</button></div>
+  <div class="lock-screen" id="scrSetupLogin"><div style="font-size:52px;margin-bottom:14px">👤</div><h2 id="sLoginT">Créer un identifiant</h2><p id="sLoginS">Choisis un nom d'utilisateur</p><input class="lk-inp" id="sLoginInp" type="text" autocomplete="off" autocapitalize="off" placeholder="Identifiant"><div class="lock-msg" id="sLoginM"></div><button class="btn btn-g" id="sLoginBtn" style="padding:10px 30px">Suivant</button></div>
+  <div class="lock-screen" id="scrSetupPW"><div style="font-size:52px;margin-bottom:14px">🔢</div><h2 id="sPWT">Créer un code</h2><p id="sPWS">Choisis un code d'accès</p><div class="pw-wrap"><input class="lk-inp masked" id="sPWInp" type="password" autocomplete="off" placeholder="Code d'accès"><div class="pw-cnt no" id="sPWCnt">0</div></div><div class="numpad" id="numpad2"></div><div class="lock-msg" id="sPWM"></div><button class="btn btn-g" id="sPWBtn" style="padding:10px 30px">Suivant</button></div>
+  <div class="lock-screen" id="scrTOTP"><div style="font-size:52px;margin-bottom:14px">🔑</div><h2 style="color:var(--t1)">2FA</h2><p style="color:var(--t3);font-size:12px;margin-bottom:6px">Code Google Authenticator</p><div class="totp-bar"><div class="totp-bar-fill" id="totpBar"></div></div><div class="totp-timer">Expire dans <span id="totpTime">30</span>s</div><input class="totp-input" id="totpInp" type="tel" maxlength="6" placeholder="000000" inputmode="numeric"><div class="totp-err" id="totpErr"></div><button class="btn btn-g" id="totpBtn" style="padding:10px 30px">Vérifier</button></div>
+</div></div>
+<div class="shell"><div id="app"></div></div>
 <div class="toast" id="toast"></div>
 <script>
 (function(){
 /* ===== CRYPTO ===== */
 const ENC=new TextEncoder(),DEC=new TextDecoder();
-async function deriveKey(pw,salt,u){const b=await crypto.subtle.importKey('raw',ENC.encode(pw),'PBKDF2',false,['deriveBits','deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:200000,hash:'SHA-256'},b,{name:'AES-GCM',length:256},false,u)}
-async function hashStr(s,salt){const k=await crypto.subtle.importKey('raw',ENC.encode(s),'PBKDF2',false,['deriveBits']);const b=await crypto.subtle.deriveBits({name:'PBKDF2',salt,iterations:200000,hash:'SHA-256'},k,256);return btoa(String.fromCharCode(...new Uint8Array(b)))}
-async function encrypt(pw,data){const s=crypto.getRandomValues(new Uint8Array(16)),iv=crypto.getRandomValues(new Uint8Array(12));const k=await deriveKey(pw,s,['encrypt']);const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},k,ENC.encode(JSON.stringify(data)));const buf=new Uint8Array(s.length+iv.length+ct.byteLength);buf.set(s,0);buf.set(iv,16);buf.set(new Uint8Array(ct),28);return btoa(String.fromCharCode(...buf))}
-async function decrypt(pw,b64){const raw=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));const k=await deriveKey(pw,raw.slice(0,16),['decrypt']);return JSON.parse(DEC.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:raw.slice(16,28)},k,raw.slice(28))))}
+async function deriveKey(pw,s,u){const b=await crypto.subtle.importKey('raw',ENC.encode(pw),'PBKDF2',false,['deriveBits','deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt:s,iterations:200000,hash:'SHA-256'},b,{name:'AES-GCM',length:256},false,u)}
+async function hashStr(s,salt){const k=await crypto.subtle.importKey('raw',ENC.encode(s),'PBKDF2',false,['deriveBits']);return btoa(String.fromCharCode(...new Uint8Array(await crypto.subtle.deriveBits({name:'PBKDF2',salt,iterations:200000,hash:'SHA-256'},k,256))))}
+async function encrypt(pw,data){const s=crypto.getRandomValues(new Uint8Array(16)),iv=crypto.getRandomValues(new Uint8Array(12));const k=await deriveKey(pw,s,['encrypt']);const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},k,ENC.encode(JSON.stringify(data)));const buf=new Uint8Array(28+ct.byteLength);buf.set(s);buf.set(iv,16);buf.set(new Uint8Array(ct),28);return btoa(String.fromCharCode(...buf))}
+async function decrypt(pw,b64){const r=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));const k=await deriveKey(pw,r.slice(0,16),['decrypt']);return JSON.parse(DEC.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:r.slice(16,28)},k,r.slice(28))))}
 
-/* ===== STORAGE KEYS ===== */
-const SK='crm_vault',HK='crm_hash',SALT_K='crm_salt',SYK='crm_sync',TK='crm_totp_enc',LHK='crm_login_hash';
+/* ===== OBFUSCATED SYNC CONFIG ===== */
+const OBK='crm_sc';
+function obf(s){return btoa(unescape(encodeURIComponent(s)).split('').map((c,i)=>String.fromCharCode(c.charCodeAt(0)^(42+i%13))).join(''))}
+function deobf(s){try{return decodeURIComponent(escape(atob(s).split('').map((c,i)=>String.fromCharCode(c.charCodeAt(0)^(42+i%13))).join('')))}catch(e){return null}}
+function getSyncConf(){const v=localStorage.getItem(OBK);if(!v){try{const old=localStorage.getItem('crm_sync');if(old){const p=JSON.parse(old);localStorage.setItem(OBK,obf(old));localStorage.removeItem('crm_sync');return p}}catch(e){}return{}}const d=deobf(v);if(!d)return{};try{return JSON.parse(d)}catch(e){return{}}}
+function setSyncConf(c){localStorage.setItem(OBK,obf(JSON.stringify(c)))}
+
+/* ===== STORAGE ===== */
+const SK='crm_vault',HK='crm_hash',SALT_K='crm_salt',TK='crm_totp_enc',LHK='crm_lh',LSK='crm_ls';
 const OLD_LS=['crm_master','crm9','crm8','crm7','crm_v5'];const OLD_PK=['crm_pw','crm_pin'];
 let masterPW=null;
-
 function getHash(){return localStorage.getItem(HK)}
-function getSalt(){let s=localStorage.getItem(SALT_K);if(!s){const a=crypto.getRandomValues(new Uint8Array(16));s=btoa(String.fromCharCode(...a));localStorage.setItem(SALT_K,s)}return Uint8Array.from(atob(s),c=>c.charCodeAt(0))}
+function getSalt(){let s=localStorage.getItem(SALT_K);if(!s){s=btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(16))));localStorage.setItem(SALT_K,s)}return Uint8Array.from(atob(s),c=>c.charCodeAt(0))}
 function getOldData(){for(const k of OLD_LS){try{const l=localStorage.getItem(k);if(l){const p=JSON.parse(l);if(Array.isArray(p)&&p.length)return p}}catch(e){}}return null}
-function getOldPW(){for(const k of OLD_PK){const v=localStorage.getItem(k);if(v)return v}return null}
-
 async function saveVault(d){if(!masterPW)return;const e=await encrypt(masterPW,d);localStorage.setItem(SK,e);cloudPush(e)}
 async function loadVault(){if(!masterPW)return[];const e=localStorage.getItem(SK);if(!e)return[];try{return await decrypt(masterPW,e)}catch(e){return[]}}
-async function setupVault(pw,d){masterPW=pw;const s=getSalt();localStorage.setItem(HK,await hashStr(pw,s));await saveVault(d)}
+async function setupVault(pw,d){masterPW=pw;localStorage.setItem(HK,await hashStr(pw,getSalt()));await saveVault(d)}
 async function verifyPW(pw){return await hashStr(pw,getSalt())===getHash()}
 async function saveTOTP(s){if(!masterPW||!s){localStorage.removeItem(TK);return}localStorage.setItem(TK,await encrypt(masterPW,{s}))}
 async function loadTOTP(){if(!masterPW)return null;const e=localStorage.getItem(TK);if(!e)return null;try{return(await decrypt(masterPW,e)).s||null}catch(e){return null}}
 
 /* ===== LOGIN (Firebase) ===== */
-function getSyncConf(){try{return JSON.parse(localStorage.getItem(SYK))||{}}catch(e){return{}}}
-function setSyncConf(c){localStorage.setItem(SYK,JSON.stringify(c))}
-function getLocalLoginHash(){return localStorage.getItem(LHK)}
-function setLocalLoginHash(h){localStorage.setItem(LHK,h)}
+function getLoginHash(){return localStorage.getItem(LHK)}
+function setLoginHash(h){localStorage.setItem(LHK,h)}
+function getLoginSalt(){return localStorage.getItem(LSK)}
+function setLoginSalt(s){localStorage.setItem(LSK,s)}
+function hasLogin(){return!!getLoginHash()&&!!getLoginSalt()}
 
 async function saveLoginToFB(login){
   const conf=getSyncConf();if(!conf.url||!conf.code)return false;
-  const loginSalt=crypto.getRandomValues(new Uint8Array(16));
-  const lsB64=btoa(String.fromCharCode(...loginSalt));
-  const h=await hashStr(login,loginSalt);
-  setLocalLoginHash(h);localStorage.setItem('crm_login_salt',lsB64);
-  try{const r=await fetch(conf.url.replace(/\/$/,'')+'/auth/'+encodeURIComponent(conf.code)+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({h,salt:lsB64,t:Date.now()})});return r.ok}catch(e){return false}
+  const ls=crypto.getRandomValues(new Uint8Array(16)),lsB=btoa(String.fromCharCode(...ls));
+  const h=await hashStr(login,ls);
+  setLoginHash(h);setLoginSalt(lsB);
+  try{return(await fetch(conf.url.replace(/\/$/,'')+'/auth/'+encodeURIComponent(conf.code)+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({h,salt:lsB,t:Date.now()})})).ok}catch(e){return false}
 }
 async function verifyLogin(login){
-  const conf=getSyncConf();
-  let storedHash=null,loginSalt=null;
-  // Try Firebase first
-  if(conf.url&&conf.code){
-    try{const r=await fetch(conf.url.replace(/\/$/,'')+'/auth/'+encodeURIComponent(conf.code)+'.json');if(r.ok){const d=await r.json();if(d?.h&&d?.salt){storedHash=d.h;loginSalt=Uint8Array.from(atob(d.salt),c=>c.charCodeAt(0));setLocalLoginHash(d.h);localStorage.setItem('crm_login_salt',d.salt)}}}catch(e){}
-  }
-  // Fallback local
-  if(!storedHash){storedHash=getLocalLoginHash();const ls=localStorage.getItem('crm_login_salt');if(ls)loginSalt=Uint8Array.from(atob(ls),c=>c.charCodeAt(0))}
-  if(!storedHash||!loginSalt)return false;
-  const h=await hashStr(login,loginSalt);
-  return h===storedHash;
+  const conf=getSyncConf();let sh=null,ls=null;
+  if(conf.url&&conf.code){try{const r=await fetch(conf.url.replace(/\/$/,'')+'/auth/'+encodeURIComponent(conf.code)+'.json');if(r.ok){const d=await r.json();if(d?.h&&d?.salt){sh=d.h;ls=Uint8Array.from(atob(d.salt),c=>c.charCodeAt(0));setLoginHash(d.h);setLoginSalt(d.salt)}}}catch(e){}}
+  if(!sh){sh=getLoginHash();const s=getLoginSalt();if(s)ls=Uint8Array.from(atob(s),c=>c.charCodeAt(0))}
+  if(!sh||!ls)return false;
+  return await hashStr(login,ls)===sh;
 }
-function hasLogin(){return!!getLocalLoginHash()}
 
 /* ===== CLOUD SYNC ===== */
 let syncState='off';
-async function cloudPush(enc){const c=getSyncConf();if(!c.url||!c.code)return;syncState='syncing';try{ra()}catch(e){}try{const r=await fetch(c.url.replace(/\/$/,'')+'/crm/'+encodeURIComponent(c.code)+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({vault:enc||localStorage.getItem(SK),updated:Date.now()})});syncState=r.ok?'synced':'error'}catch(e){syncState='error'}try{ra()}catch(e){}}
-async function cloudPull(){const c=getSyncConf();if(!c.url||!c.code)return null;syncState='syncing';try{const r=await fetch(c.url.replace(/\/$/,'')+'/crm/'+encodeURIComponent(c.code)+'.json');if(!r.ok){syncState='error';return null}const d=await r.json();syncState='synced';return d?.vault||null}catch(e){syncState='error';return null}}
+async function cloudPush(enc){const c=getSyncConf();if(!c.url||!c.code)return;syncState='syncing';try{ra()}catch(e){}try{syncState=(await fetch(c.url.replace(/\/$/,'')+'/crm/'+encodeURIComponent(c.code)+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({vault:enc||localStorage.getItem(SK),updated:Date.now()})})).ok?'synced':'error'}catch(e){syncState='error'}try{ra()}catch(e){}}
+async function cloudPull(){const c=getSyncConf();if(!c.url||!c.code)return null;try{const r=await fetch(c.url.replace(/\/$/,'')+'/crm/'+encodeURIComponent(c.code)+'.json');if(!r.ok)return null;const d=await r.json();syncState='synced';return d?.vault||null}catch(e){syncState='error';return null}}
 async function fullSync(){if(!masterPW)return;const rem=await cloudPull();if(!rem){await cloudPush();return}try{const rd=await decrypt(masterPW,rem);const map=new Map();rd.forEach(c=>map.set(c.id,c));C.forEach(c=>{const x=map.get(c.id);if(!x||((c.lastModified||'')>=(x.lastModified||'')))map.set(c.id,c)});C=[...map.values()];await saveVault(C);tt('☁️ Sync OK');ra()}catch(e){await cloudPush();ra()}}
 
 /* ===== INTRUSION LOG ===== */
-let intrusionLog=[];
-async function logIntrusion(login){
-  const conf=getSyncConf();if(!conf.url||!conf.code)return;
-  const entry={login:login,time:new Date().toISOString(),ua:navigator.userAgent.slice(0,120),lang:navigator.language,screen:screen.width+'x'+screen.height};
-  try{await fetch(conf.url.replace(/\/$/,'')+'/logs/'+encodeURIComponent(conf.code)+'.json',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(entry)})}catch(e){}
-}
-async function fetchIntrusionLog(){
-  const conf=getSyncConf();if(!conf.url||!conf.code)return[];
-  try{const r=await fetch(conf.url.replace(/\/$/,'')+'/logs/'+encodeURIComponent(conf.code)+'.json');if(!r.ok)return[];const d=await r.json();if(!d)return[];return Object.values(d).sort((a,b)=>b.time>a.time?1:-1).slice(0,50)}catch(e){return[]}
-}
-async function clearIntrusionLog(){
-  const conf=getSyncConf();if(!conf.url||!conf.code)return;
-  try{await fetch(conf.url.replace(/\/$/,'')+'/logs/'+encodeURIComponent(conf.code)+'.json',{method:'DELETE'})}catch(e){}
-}
+async function logIntrusion(login){const c=getSyncConf();if(!c.url||!c.code)return;try{await fetch(c.url.replace(/\/$/,'')+'/logs/'+encodeURIComponent(c.code)+'.json',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({login,time:new Date().toISOString(),ua:navigator.userAgent.slice(0,120),lang:navigator.language,screen:screen.width+'x'+screen.height})})}catch(e){}}
+async function fetchLogs(){const c=getSyncConf();if(!c.url||!c.code)return[];try{const r=await fetch(c.url.replace(/\/$/,'')+'/logs/'+encodeURIComponent(c.code)+'.json');if(!r.ok)return[];const d=await r.json();return d?Object.values(d).sort((a,b)=>b.time>a.time?1:-1).slice(0,50):[]}catch(e){return[]}}
+async function clearLogs(){const c=getSyncConf();if(!c.url||!c.code)return;try{await fetch(c.url.replace(/\/$/,'')+'/logs/'+encodeURIComponent(c.code)+'.json',{method:'DELETE'})}catch(e){}}
 
 /* ===== TOTP ===== */
 const B32='ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
 function b32enc(b){let s='',r='';for(let i=0;i<b.length;i++)s+=b[i].toString(2).padStart(8,'0');for(let i=0;i<s.length;i+=5)r+=B32[parseInt(s.substr(i,5).padEnd(5,'0'),2)];return r}
 function b32dec(s){let b='',a=[];s=s.replace(/=+$/,'').toUpperCase();for(let i=0;i<s.length;i++){const v=B32.indexOf(s[i]);if(v>=0)b+=v.toString(2).padStart(5,'0')}for(let i=0;i+8<=b.length;i+=8)a.push(parseInt(b.substr(i,8),2));return new Uint8Array(a)}
 function genSecret(){return b32enc(crypto.getRandomValues(new Uint8Array(20)))}
-async function calcTOTP(s,t){const k=b32dec(s);const tv=Math.floor((t||Date.now()/1000)/30);const tb=new ArrayBuffer(8);new DataView(tb).setUint32(4,tv);try{const ck=await crypto.subtle.importKey('raw',k,{name:'HMAC',hash:'SHA-1'},false,['sign']);const sg=await crypto.subtle.sign('HMAC',ck,tb);const h=new Uint8Array(sg);const o=h[h.length-1]&0xf;return(((h[o]&0x7f)<<24|(h[o+1]&0xff)<<16|(h[o+2]&0xff)<<8|(h[o+3]&0xff))%1000000).toString().padStart(6,'0')}catch(e){return null}}
+async function calcTOTP(s,t){const k=b32dec(s),tv=Math.floor((t||Date.now()/1000)/30),tb=new ArrayBuffer(8);new DataView(tb).setUint32(4,tv);try{const sg=new Uint8Array(await crypto.subtle.sign('HMAC',await crypto.subtle.importKey('raw',k,{name:'HMAC',hash:'SHA-1'},false,['sign']),tb));const o=sg[sg.length-1]&0xf;return(((sg[o]&0x7f)<<24|(sg[o+1]&0xff)<<16|(sg[o+2]&0xff)<<8|(sg[o+3]&0xff))%1000000).toString().padStart(6,'0')}catch(e){return null}}
 async function verifyTOTP(s,c){const n=Date.now()/1000;for(let i=-1;i<=1;i++){if(await calcTOTP(s,n+i*30)===c)return true}return false}
 function getQRURL(s){return`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent('otpauth://totp/MyCRM?secret='+s+'&issuer=MyCRM&digits=6&period=30')}`}
 
-/* ===== APP ===== */
-const SECS=[{s:'Identité',f:[{k:'prenom',l:'Prénom',i:'✏️',t:'text'},{k:'nom',l:'Nom',i:'👤',t:'text'},{k:'telephone',l:'Téléphone',i:'📱',t:'tel'},{k:'email',l:'Email',i:'✉️',t:'email'},{k:'username',l:'Username',i:'🔑',t:'text'},{k:'dateNaissance',l:'Date naissance',i:'🎂',t:'date'}]},{s:'Professionnel',f:[{k:'entreprise',l:'Entreprise',i:'🏢',t:'text'},{k:'poste',l:'Poste',i:'💼',t:'text'},{k:'villeTravail',l:'Ville',i:'🏙️',t:'text'},{k:'salaire',l:'Salaire',i:'💰',t:'number',sx:'€'},{k:'pourcentage',l:'% Commission',i:'📊',t:'number',sx:'%'}]},{s:'Autres',f:[{k:'adresse',l:'Adresse',i:'📍',t:'text',fu:1},{k:'tags',l:'Tags',i:'🏷️',t:'text',fu:1,ph:'VIP, prospect'},{k:'dernierContact',l:'Dernier contact',i:'📅',t:'date'},{k:'notes',l:'Notes',i:'📝',t:'textarea',fu:1}]}];
-const AK=SECS.flatMap(s=>s.f.map(f=>f.k));
-const MO=['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'];
-const CURS=['EUR','USD','TND','Crédit'];const CUR_CLS={EUR:'cur-eur',USD:'cur-usd',TND:'cur-tnd','Crédit':'cur-credit'};const CUR_SYM={EUR:'€',USD:'$',TND:'TND','Crédit':'CR'};const CUR_CLR={EUR:'var(--b)',USD:'var(--g)',TND:'var(--o)','Crédit':'var(--p)'};
+/* ===== AUTO-LOCK ===== */
+const LOCK_TIMEOUT=2*60*1000; // 2 minutes
+let lastActivity=Date.now(),autoLockTimer=null;
+function resetActivity(){lastActivity=Date.now()}
+function startAutoLock(){clearInterval(autoLockTimer);autoLockTimer=setInterval(()=>{if(!pl&&Date.now()-lastActivity>LOCK_TIMEOUT){pl=true;masterPW=null;document.getElementById('lock').classList.remove('out');if(hasLogin()){pm='login';showScreen('scrLogin');focusEl('loginInp')}else{pm='pw_unlock';showScreen('scrPW');setupNumpad('numpad');focusEl('pwInp')}bindLock()}},10000)}
+function watchActivity(){['click','touchstart','keydown','scroll'].forEach(e=>document.addEventListener(e,resetActivity,{passive:true}))}
 
+/* ===== APP STATE ===== */
+const SECS=[{s:'Identité',f:[{k:'prenom',l:'Prénom',i:'✏️',t:'text'},{k:'nom',l:'Nom',i:'👤',t:'text'},{k:'telephone',l:'Téléphone',i:'📱',t:'tel'},{k:'email',l:'Email',i:'✉️',t:'email'},{k:'username',l:'Username',i:'🔑',t:'text'},{k:'dateNaissance',l:'Date naissance',i:'🎂',t:'date'}]},{s:'Professionnel',f:[{k:'entreprise',l:'Entreprise',i:'🏢',t:'text'},{k:'poste',l:'Poste',i:'💼',t:'text'},{k:'villeTravail',l:'Ville',i:'🏙️',t:'text'},{k:'salaire',l:'Salaire',i:'💰',t:'number',sx:'€'},{k:'pourcentage',l:'% Commission',i:'📊',t:'number',sx:'%'}]},{s:'Autres',f:[{k:'adresse',l:'Adresse',i:'📍',t:'text',fu:1},{k:'tags',l:'Tags',i:'🏷️',t:'text',fu:1,ph:'VIP, prospect'},{k:'dernierContact',l:'Dernier contact',i:'📅',t:'date'},{k:'notes',l:'Notes',i:'📝',t:'textarea',fu:1}]}];
+const AK=SECS.flatMap(s=>s.f.map(f=>f.k));const MO=['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'];
+const CURS=['EUR','USD','TND','Crédit'];const CUR_CLS={EUR:'cur-eur',USD:'cur-usd',TND:'cur-tnd','Crédit':'cur-credit'};const CUR_SYM={EUR:'€',USD:'$',TND:'TND','Crédit':'CR'};const CUR_CLR={EUR:'var(--b)',USD:'var(--g)',TND:'var(--o)','Crédit':'var(--p)'};
 let C=[],tab='list',vw='list',sid=null,ed=null,sq='',so='nom',ft='',dc=null,stg=false,impModal=false,impData=[],impSel=new Set(),tfaModal=false,tfaSetupSecret='',chpwModal=false,chpwStep=0,newPW='';
-let pm='login',pe='',pl=true;
-let mM='',mA='',iDesc='',iAmt='',iCur='EUR',iPaid=false,totpTimer=null,totpSecret=null;
-// Lockout
-let failCount=0,lockUntil=0,lockInterval=null;
-// Setup state
-let setupLogin='',setupPW='';
+let pm='login',pe='',pl=true,mM='',mA='',iDesc='',iAmt='',iCur='EUR',iPaid=false,totpTimer=null,totpSecret=null;
+let failCount=0,lockUntil=0,lockInterval=null,setupLogin='',setupPW='';
 
 function showScreen(id){document.querySelectorAll('.lock-screen').forEach(s=>s.classList.remove('show'));document.getElementById(id)?.classList.add('show')}
-
-async function init(){
-  const conf=getSyncConf();
-  // Pull login hash from Firebase if not stored locally yet (new device)
-  if(!getLocalLoginHash()&&conf.url&&conf.code){
-    try{const r=await fetch(conf.url.replace(/\/$/,'')+'/auth/'+encodeURIComponent(conf.code)+'.json');if(r.ok){const d=await r.json();if(d?.h&&d?.salt){setLocalLoginHash(d.h);localStorage.setItem('crm_login_salt',d.salt)}else if(d?.h&&!d?.salt){
-      // Old format without salt — delete and re-setup
-      try{await fetch(conf.url.replace(/\/$/,'')+'/auth/'+encodeURIComponent(conf.code)+'.json',{method:'DELETE'})}catch(e){}
-    }}}catch(e){}
-  }
-  const hasV=!!getHash();
-  // Clear stale login hash if no salt (old format)
-  if(getLocalLoginHash()&&!localStorage.getItem('crm_login_salt')){localStorage.removeItem(LHK)}
-  const hasL=hasLogin();
-  if(hasL){
-    // Login exists → always show login first
-    pm='login';showScreen('scrLogin');focusEl('loginInp');
-  } else if(hasV&&!hasL){
-    if(conf.url&&conf.code){
-      // Firebase config exists but no login → create one
-      pm='setup_login';showScreen('scrSetupLogin');focusEl('sLoginInp');
-    } else {
-      // No Firebase config → need it first
-      pm='sync_for_login';showScreen('scrSetupFB');focusEl('setupFBUrl');
-    }
-  } else {
-    // No vault = new user
-    if(conf.url&&conf.code){pm='setup_login';showScreen('scrSetupLogin');focusEl('sLoginInp')}
-    else{pm='setup_fb';showScreen('scrSetupFB');focusEl('setupFBUrl')}
-  }
-  bindLock();
-}
-
 function focusEl(id){setTimeout(()=>document.getElementById(id)?.focus(),100)}
 function tt(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
 function Q(s,fn){const e=document.querySelector(s);if(e)fn(e)}
 function E(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 
-function setupNumpad(id){
-  const pad=document.getElementById(id);if(!pad)return;pad.innerHTML='';
-  const target=id==='numpad'?'pwInp':'sPWInp';const cntId=id==='numpad'?'pwCnt':'sPWCnt';
-  [1,2,3,4,5,6,7,8,9,'*',0,'⌫'].forEach(n=>{const b=document.createElement('div');b.className='nk';b.textContent=n;
-    if(n==='⌫'){b.style.fontSize='18px';b.onclick=()=>{const i=document.getElementById(target);if(i){i.value=i.value.slice(0,-1);updCnt(cntId,i.value.length)}}}
-    else{b.onclick=()=>{const i=document.getElementById(target);if(i){i.value+=String(n);updCnt(cntId,i.value.length)}}}
-    pad.appendChild(b)})
+async function init(){
+  const conf=getSyncConf();
+  if(!getLoginHash()&&conf.url&&conf.code){try{const r=await fetch(conf.url.replace(/\/$/,'')+'/auth/'+encodeURIComponent(conf.code)+'.json');if(r.ok){const d=await r.json();if(d?.h&&d?.salt){setLoginHash(d.h);setLoginSalt(d.salt)}else if(d?.h&&!d?.salt){try{await fetch(conf.url.replace(/\/$/,'')+'/auth/'+encodeURIComponent(conf.code)+'.json',{method:'DELETE'})}catch(e){}}}}catch(e){}}
+  if(getLoginHash()&&!getLoginSalt())localStorage.removeItem(LHK);
+  const hasV=!!getHash(),hasL=hasLogin();
+  if(hasL){pm='login';showScreen('scrLogin');focusEl('loginInp')}
+  else if(hasV&&!hasL){if(conf.url&&conf.code){pm='setup_login';showScreen('scrSetupLogin');focusEl('sLoginInp')}else{pm='sync_for_login';showScreen('scrSetupFB');focusEl('setupFBUrl')}}
+  else{if(conf.url&&conf.code){pm='setup_login';showScreen('scrSetupLogin');focusEl('sLoginInp')}else{pm='setup_fb';showScreen('scrSetupFB');focusEl('setupFBUrl')}}
+  bindLock();watchActivity();startAutoLock();
 }
-function updCnt(id,l){const c=document.getElementById(id);if(c){c.textContent=l;c.className='pw-cnt '+(l>=8?'ok':'no')}}
 
+function setupNumpad(id){const pad=document.getElementById(id);if(!pad)return;pad.innerHTML='';const t=id==='numpad'?'pwInp':'sPWInp',cn=id==='numpad'?'pwCnt':'sPWCnt';
+  [1,2,3,4,5,6,7,8,9,'*',0,'⌫'].forEach(n=>{const b=document.createElement('div');b.className='nk';b.textContent=n;if(n==='⌫'){b.style.fontSize='18px';b.onclick=()=>{const i=document.getElementById(t);if(i){i.value=i.value.slice(0,-1);updC(cn,i.value.length)}}}else{b.onclick=()=>{const i=document.getElementById(t);if(i){i.value+=String(n);updC(cn,i.value.length)}}};pad.appendChild(b)})}
+function updC(id,l){const c=document.getElementById(id);if(c){c.textContent=l;c.className='pw-cnt '+(l>=8?'ok':'no')}}
 function isLocked(){return Date.now()<lockUntil}
-function startLockTimer(){
-  const el=document.getElementById('loginTimer');if(!el)return;el.style.display='block';
-  clearInterval(lockInterval);
-  lockInterval=setInterval(()=>{const left=Math.ceil((lockUntil-Date.now())/1000);if(left<=0){el.style.display='none';clearInterval(lockInterval);document.getElementById('loginM').textContent='';document.getElementById('loginM').className='lock-msg'}else{el.textContent=`⏳ ${Math.floor(left/60)}:${(left%60).toString().padStart(2,'0')}`}},1000)
-}
+function startLockTimer(){const el=document.getElementById('loginTimer');if(!el)return;el.style.display='block';clearInterval(lockInterval);lockInterval=setInterval(()=>{const left=Math.ceil((lockUntil-Date.now())/1000);if(left<=0){el.style.display='none';clearInterval(lockInterval);const m=document.getElementById('loginM');if(m){m.textContent='';m.className='lock-msg'}}else{el.textContent=`⏳ ${Math.floor(left/60)}:${(left%60).toString().padStart(2,'0')}`}},1000)}
 
 function bindLock(){
-  // Login
-  const liI=document.getElementById('loginInp'),liB=document.getElementById('loginBtn');
-  if(liI)liI.onkeydown=e=>{if(e.key==='Enter')doLogin()};
-  if(liB)liB.onclick=doLogin;
-  // Password unlock
-  const pwI=document.getElementById('pwInp'),pwB=document.getElementById('pwBtn');
-  if(pwI){pwI.oninput=()=>updCnt('pwCnt',pwI.value.length);pwI.onkeydown=e=>{if(e.key==='Enter')doPWUnlock()}}
-  if(pwB)pwB.onclick=doPWUnlock;
-  setupNumpad('numpad');
-  Q('#pwSkip',e=>e.onclick=()=>{pm='setup_pw';showScreen('scrSetupPW');setupNumpad('numpad2');focusEl('sPWInp');document.getElementById('sPWT').textContent='Créer un code';document.getElementById('sPWS').textContent='Choisis un code d\'accès'});
-  // Setup FB
+  const li=document.getElementById('loginInp');if(li)li.onkeydown=e=>{if(e.key==='Enter')doLogin()};
+  Q('#loginBtn',e=>e.onclick=doLogin);
+  const pw=document.getElementById('pwInp');if(pw){pw.oninput=()=>updC('pwCnt',pw.value.length);pw.onkeydown=e=>{if(e.key==='Enter')doPW()}}
+  Q('#pwBtn',e=>e.onclick=doPW);setupNumpad('numpad');
+  Q('#pwSkip',e=>{e.style.display='none';e.onclick=()=>{pm='setup_pw';showScreen('scrSetupPW');setupNumpad('numpad2');focusEl('sPWInp')}});
   Q('#setupFBBtn',e=>e.onclick=doSetupFB);
-  Q('#setupFBSkip',e=>e.onclick=()=>{
-    if(pm==='sync_for_login'){pm='pw_unlock';showScreen('scrPW');setupNumpad('numpad');focusEl('pwInp')}
-    else{pm='setup_login';showScreen('scrSetupLogin');focusEl('sLoginInp')}
-  });
-  // Setup Login
-  const slI=document.getElementById('sLoginInp'),slB=document.getElementById('sLoginBtn');
-  if(slI)slI.onkeydown=e=>{if(e.key==='Enter')doSetupLogin()};
-  if(slB)slB.onclick=doSetupLogin;
-  // Setup PW
-  const spI=document.getElementById('sPWInp'),spB=document.getElementById('sPWBtn');
-  if(spI){spI.oninput=()=>updCnt('sPWCnt',spI.value.length);spI.onkeydown=e=>{if(e.key==='Enter')doSetupPW()}}
-  if(spB)spB.onclick=doSetupPW;
-  setupNumpad('numpad2');
-  // TOTP
-  const tI=document.getElementById('totpInp');
-  if(tI){tI.value='';tI.oninput=()=>{tI.value=tI.value.replace(/\D/g,'').slice(0,6);if(tI.value.length===6)doTOTP()}}
+  Q('#setupFBSkip',e=>e.onclick=()=>{if(pm==='sync_for_login'&&getHash()){pm='pw_unlock';showScreen('scrPW');setupNumpad('numpad');focusEl('pwInp')}else{pm='setup_login';showScreen('scrSetupLogin');focusEl('sLoginInp')}});
+  const sl=document.getElementById('sLoginInp');if(sl)sl.onkeydown=e=>{if(e.key==='Enter')doSetupLogin()};
+  Q('#sLoginBtn',e=>e.onclick=doSetupLogin);
+  const sp=document.getElementById('sPWInp');if(sp){sp.oninput=()=>updC('sPWCnt',sp.value.length);sp.onkeydown=e=>{if(e.key==='Enter')doSetupPW()}}
+  Q('#sPWBtn',e=>e.onclick=doSetupPW);setupNumpad('numpad2');
+  const ti=document.getElementById('totpInp');if(ti){ti.value='';ti.oninput=()=>{ti.value=ti.value.replace(/\D/g,'').slice(0,6);if(ti.value.length===6)doTOTP()}}
   Q('#totpBtn',e=>e.onclick=doTOTP);
 }
 
-// === LOGIN ===
-async function doLogin(){
-  if(isLocked()){return}
-  const v=document.getElementById('loginInp')?.value?.trim();
-  if(!v){document.getElementById('loginM').textContent='Champ requis';document.getElementById('loginM').className='lock-msg err';return}
-  const ok=await verifyLogin(v);
-  if(ok){
-    failCount=0;
-    document.getElementById('loginM').textContent='';
-    if(getHash()){pm='pw_unlock';showScreen('scrPW');setupNumpad('numpad');focusEl('pwInp')}
-    else{pm='setup_pw';showScreen('scrSetupPW');setupNumpad('numpad2');focusEl('sPWInp')}
-  } else {
-    failCount++;
-    logIntrusion(v);
-    if(failCount>=3){lockUntil=Date.now()+5*60*1000;startLockTimer();document.getElementById('loginM').textContent='Accès bloqué';document.getElementById('loginM').className='lock-msg err';failCount=0}
-    else{document.getElementById('loginM').textContent='Accès refusé';document.getElementById('loginM').className='lock-msg err'}
-    document.getElementById('loginInp').value='';
-  }
-}
+async function doLogin(){if(isLocked())return;const v=document.getElementById('loginInp')?.value?.trim();if(!v){document.getElementById('loginM').textContent='Champ requis';document.getElementById('loginM').className='lock-msg err';return}
+  if(await verifyLogin(v)){failCount=0;document.getElementById('loginM').textContent='';if(getHash()){pm='pw_unlock';showScreen('scrPW');setupNumpad('numpad');focusEl('pwInp')}else{pm='setup_pw';showScreen('scrSetupPW');setupNumpad('numpad2');focusEl('sPWInp')}}
+  else{failCount++;logIntrusion(v);if(failCount>=3){lockUntil=Date.now()+5*60*1000;startLockTimer();document.getElementById('loginM').textContent='Accès bloqué';document.getElementById('loginM').className='lock-msg err';failCount=0}else{document.getElementById('loginM').textContent='Accès refusé';document.getElementById('loginM').className='lock-msg err'}document.getElementById('loginInp').value=''}}
 
-// === PW UNLOCK ===
-async function doPWUnlock(){
-  const v=document.getElementById('pwInp')?.value||'';
-  if(await verifyPW(v)){
-    masterPW=v;C=await loadVault();
-    if(!C.length){const old=getOldData();if(old?.length){C=old;await saveVault(C);OLD_LS.forEach(k=>localStorage.removeItem(k));OLD_PK.forEach(k=>localStorage.removeItem(k))}}
-    totpSecret=await loadTOTP();
-    if(totpSecret){showScreen('scrTOTP');startTotpTimer();focusEl('totpInp');return}
-    unlock();
-  }else{document.getElementById('pwM').textContent='Accès refusé';document.getElementById('pwM').className='lock-msg err';document.getElementById('pwInp').value='';updCnt('pwCnt',0)}
-}
+async function doPW(){const v=document.getElementById('pwInp')?.value||'';if(await verifyPW(v)){masterPW=v;C=await loadVault();if(!C.length){const old=getOldData();if(old?.length){C=old;await saveVault(C);OLD_LS.forEach(k=>localStorage.removeItem(k));OLD_PK.forEach(k=>localStorage.removeItem(k))}}totpSecret=await loadTOTP();if(totpSecret){showScreen('scrTOTP');startTotpTimer();focusEl('totpInp');return}unlock()}else{document.getElementById('pwM').textContent='Accès refusé';document.getElementById('pwM').className='lock-msg err';document.getElementById('pwInp').value='';updC('pwCnt',0)}}
 
-// === SETUP FB ===
-async function doSetupFB(){
-  const url=document.getElementById('setupFBUrl')?.value?.trim(),code=document.getElementById('setupFBCode')?.value?.trim();
-  if(!url||!code){document.getElementById('setupFBM').textContent='Les deux champs sont requis';return}
-  setSyncConf({url,code});
-  // Try to pull existing login from Firebase
-  try{const r=await fetch(url.replace(/\/$/,'')+'/auth/'+encodeURIComponent(code)+'.json');if(r.ok){const d=await r.json();if(d?.h){setLocalLoginHash(d.h);if(d.salt)localStorage.setItem('crm_login_salt',d.salt);pm='login';showScreen('scrLogin');focusEl('loginInp');return}}}catch(e){}
-  // No login in Firebase → create one
-  pm='setup_login';showScreen('scrSetupLogin');focusEl('sLoginInp');
-}
+async function doSetupFB(){const url=document.getElementById('setupFBUrl')?.value?.trim(),code=document.getElementById('setupFBCode')?.value?.trim();if(!url||!code){document.getElementById('setupFBM').textContent='Requis';return}setSyncConf({url,code});try{const r=await fetch(url.replace(/\/$/,'')+'/auth/'+encodeURIComponent(code)+'.json');if(r.ok){const d=await r.json();if(d?.h&&d?.salt){setLoginHash(d.h);setLoginSalt(d.salt);pm='login';showScreen('scrLogin');focusEl('loginInp');return}}}catch(e){}pm='setup_login';showScreen('scrSetupLogin');focusEl('sLoginInp')}
 
-// === SETUP LOGIN ===
-async function doSetupLogin(){
-  const v=document.getElementById('sLoginInp')?.value?.trim();
-  if(!v||v.length<3){document.getElementById('sLoginM').textContent='Min. 3 caractères';document.getElementById('sLoginM').className='lock-msg err';return}
-  if(pm==='setup_login_confirm'){
-    if(v===setupLogin){
-      await saveLoginToFB(v);
-      if(getHash()){pm='pw_unlock';showScreen('scrPW');setupNumpad('numpad');focusEl('pwInp')}
-      else{pm='setup_pw';showScreen('scrSetupPW');setupNumpad('numpad2');focusEl('sPWInp')}
-    }else{document.getElementById('sLoginM').textContent='Ne correspond pas';document.getElementById('sLoginM').className='lock-msg err';document.getElementById('sLoginInp').value='';pm='setup_login';document.getElementById('sLoginT').textContent='Créer un identifiant';document.getElementById('sLoginS').textContent='Choisis un nom d\'utilisateur'}
-  }else{
-    setupLogin=v;pm='setup_login_confirm';
-    document.getElementById('sLoginT').textContent='Confirmer';
-    document.getElementById('sLoginS').textContent='Retape l\'identifiant';
-    document.getElementById('sLoginInp').value='';document.getElementById('sLoginM').textContent='';focusEl('sLoginInp');
-  }
-}
+async function doSetupLogin(){const v=document.getElementById('sLoginInp')?.value?.trim();if(!v||v.length<3){document.getElementById('sLoginM').textContent='Min. 3 caractères';document.getElementById('sLoginM').className='lock-msg err';return}
+  if(pm==='setup_login_confirm'){if(v===setupLogin){await saveLoginToFB(v);if(getHash()){pm='pw_unlock';showScreen('scrPW');setupNumpad('numpad');focusEl('pwInp')}else{pm='setup_pw';showScreen('scrSetupPW');setupNumpad('numpad2');focusEl('sPWInp')}}else{document.getElementById('sLoginM').textContent='Ne correspond pas';document.getElementById('sLoginM').className='lock-msg err';document.getElementById('sLoginInp').value='';pm='setup_login';document.getElementById('sLoginT').textContent='Créer un identifiant';document.getElementById('sLoginS').textContent='Choisis un nom d\'utilisateur'}}
+  else{setupLogin=v;pm='setup_login_confirm';document.getElementById('sLoginT').textContent='Confirmer';document.getElementById('sLoginS').textContent='Retape l\'identifiant';document.getElementById('sLoginInp').value='';document.getElementById('sLoginM').textContent='';focusEl('sLoginInp')}}
 
-// === SETUP PW ===
-async function doSetupPW(){
-  const v=document.getElementById('sPWInp')?.value||'';
-  if(pm==='setup_pw_confirm'){
-    if(v===setupPW){
-      let old=getOldData()||[];
-      if(!old.length){try{const idb=await new Promise(r=>{try{const q=indexedDB.open('crm_master',1);q.onupgradeneeded=e=>e.target.transaction.abort();q.onsuccess=e=>{const d=e.target.result;try{const t=d.transaction('d','readonly').objectStore('d').get('c');t.onsuccess=()=>{d.close();r(t.result&&Array.isArray(t.result)?t.result:null)};t.onerror=()=>{d.close();r(null)}}catch(err){d.close();r(null)}};q.onerror=()=>r(null)}catch(e){r(null)}});if(idb?.length)old=idb}catch(e){}}
-      await setupVault(v,old);C=old;
-      OLD_LS.forEach(k=>localStorage.removeItem(k));OLD_PK.forEach(k=>localStorage.removeItem(k));
-      unlock();tt('✅ Sécurisé');
-    }else{document.getElementById('sPWM').textContent='Ne correspond pas';document.getElementById('sPWM').className='lock-msg err';document.getElementById('sPWInp').value='';updCnt('sPWCnt',0);pm='setup_pw';document.getElementById('sPWT').textContent='Créer un code';document.getElementById('sPWS').textContent='Choisis un code d\'accès'}
-  }else{
-    if(v.length<8){document.getElementById('sPWM').textContent='Minimum 8 caractères';document.getElementById('sPWM').className='lock-msg err';return}
-    setupPW=v;pm='setup_pw_confirm';
-    document.getElementById('sPWT').textContent='Confirmer le code';
-    document.getElementById('sPWS').textContent='Retape le code';
-    document.getElementById('sPWInp').value='';updCnt('sPWCnt',0);
-    document.getElementById('sPWM').textContent='';focusEl('sPWInp');
-  }
-}
+async function doSetupPW(){const v=document.getElementById('sPWInp')?.value||'';if(pm==='setup_pw_confirm'){if(v===setupPW){let old=getOldData()||[];if(!old.length){try{const idb=await new Promise(r=>{try{const q=indexedDB.open('crm_master',1);q.onupgradeneeded=e=>e.target.transaction.abort();q.onsuccess=e=>{const d=e.target.result;try{const t=d.transaction('d','readonly').objectStore('d').get('c');t.onsuccess=()=>{d.close();r(t.result&&Array.isArray(t.result)?t.result:null)};t.onerror=()=>{d.close();r(null)}}catch(er){d.close();r(null)}};q.onerror=()=>r(null)}catch(e){r(null)}});if(idb?.length)old=idb}catch(e){}}await setupVault(v,old);C=old;OLD_LS.forEach(k=>localStorage.removeItem(k));OLD_PK.forEach(k=>localStorage.removeItem(k));unlock();tt('✅ Sécurisé')}else{document.getElementById('sPWM').textContent='Ne correspond pas';document.getElementById('sPWM').className='lock-msg err';document.getElementById('sPWInp').value='';updC('sPWCnt',0);pm='setup_pw';document.getElementById('sPWT').textContent='Créer un code';document.getElementById('sPWS').textContent='Choisis un code d\'accès'}}
+  else{if(v.length<8){document.getElementById('sPWM').textContent='Minimum 8 caractères';document.getElementById('sPWM').className='lock-msg err';return}setupPW=v;pm='setup_pw_confirm';document.getElementById('sPWT').textContent='Confirmer le code';document.getElementById('sPWS').textContent='Retape le code';document.getElementById('sPWInp').value='';updC('sPWCnt',0);document.getElementById('sPWM').textContent='';focusEl('sPWInp')}}
 
-// === TOTP ===
-function startTotpTimer(){clearInterval(totpTimer);updTotpTimer();totpTimer=setInterval(updTotpTimer,1000)}
-function updTotpTimer(){const s=30-Math.floor(Date.now()/1000)%30;const e=document.getElementById('totpTime');if(e)e.textContent=s;const b=document.getElementById('totpBar');if(b)b.style.width=(s/30*100)+'%'}
+function startTotpTimer(){clearInterval(totpTimer);updTT();totpTimer=setInterval(updTT,1000)}
+function updTT(){const s=30-Math.floor(Date.now()/1000)%30;const e=document.getElementById('totpTime');if(e)e.textContent=s;const b=document.getElementById('totpBar');if(b)b.style.width=(s/30*100)+'%'}
 async function doTOTP(){const i=document.getElementById('totpInp'),err=document.getElementById('totpErr');const c=i?.value?.trim();if(!c||c.length!==6){if(err)err.textContent='6 chiffres';return}if(await verifyTOTP(totpSecret,c)){clearInterval(totpTimer);unlock();tt('✅ Authentifié')}else{if(err)err.textContent='Accès refusé';if(i){i.value='';i.focus()}}}
 
-function unlock(){pl=false;document.getElementById('lock').classList.add('out');ra();const c=getSyncConf();if(c.url&&c.code)fullSync()}
+function unlock(){pl=false;resetActivity();document.getElementById('lock').classList.add('out');ra();const c=getSyncConf();if(c.url&&c.code)fullSync()}
 
 /* ===== UTILS ===== */
 function mkN(){const c={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),dateAjout:new Date().toISOString().split('T')[0],lastModified:new Date().toISOString(),fav:false,monthly:[],invoices:[]};AK.forEach(k=>{if(!c[k])c[k]=''});return c}
 function fmt(n){return Math.round(n).toLocaleString('fr')}
-function fmtM(d){if(!d)return'?';const p=d.split('-');if(p.length>=2)return MO[parseInt(p[1])-1]+' '+p[0].slice(2);return d}
+function fmtM(d){if(!d)return'?';const p=d.split('-');return p.length>=2?MO[parseInt(p[1])-1]+' '+p[0].slice(2):d}
 function pendByCur(c){const r={};(c.invoices||[]).filter(i=>!i.paid).forEach(i=>{const k=i.currency||'EUR';r[k]=(r[k]||0)+Number(i.amount||0)});return r}
 function totalPending(c){return(c.invoices||[]).filter(i=>!i.paid).reduce((s,i)=>s+Number(i.amount||0),0)}
 function totalCA(c){return(c.monthly||[]).reduce((s,m)=>s+Number(m.amount||0),0)}
 async function sv(){await saveVault(C)}
 
 /* ===== RENDER ===== */
-function ra(){
-  const a=document.getElementById('app');let h='';const conf=getSyncConf(),hasSy=conf.url&&conf.code;
-  const syncDot=hasSy?`<div class="sync-dot ${syncState==='synced'?'sync-on':syncState==='syncing'?'sync-ing':'sync-off'}"></div>`:'';
-  h+=`<div class="hdr"><div class="hdr-l"><span class="brand">My<span>CRM</span></span><div class="shield">🛡️ AES-256</div><span class="cnt">${C.length}</span>${syncDot}</div><div style="display:flex;gap:6px">${tab==='list'&&vw==='list'?`<button class="btn btn-s" id="sB" style="padding:5px 9px;font-size:13px">⚙️</button><button class="btn btn-g" id="aB" style="padding:7px 12px">+ Nouveau</button>`:''}</div></div>`;
+function ra(){const a=document.getElementById('app');let h='';const conf=getSyncConf(),hasSy=conf.url&&conf.code;
+  const sd=hasSy?`<div class="sync-dot ${syncState==='synced'?'sync-on':syncState==='syncing'?'sync-ing':'sync-off'}"></div>`:'';
+  h+=`<div class="hdr"><div class="hdr-l"><span class="brand">My<span>CRM</span></span><div class="shield">🛡️ AES-256</div><span class="cnt">${C.length}</span>${sd}</div><div style="display:flex;gap:6px">${tab==='list'&&vw==='list'?`<button class="btn btn-s" id="sB" style="padding:5px 9px;font-size:13px">⚙️</button><button class="btn btn-g" id="aB" style="padding:7px 12px">+ Nouveau</button>`:''}</div></div>`;
   h+=rSettings()+rImpModal()+rTfaModal()+rChpwModal();
   if(tab==='list'&&vw==='list')h+=rList();else if(tab==='list'&&vw==='detail')h+=rDetail();else if(tab==='list'&&vw==='form')h+=rForm();else if(tab==='dash')h+=rDash();
   h+=`<div class="nav"><div class="nav-item ${tab==='list'?'act':''}" data-tab="list"><div class="ni">👥</div>Contacts</div><div class="nav-item ${tab==='dash'?'act':''}" data-tab="dash"><div class="ni">📊</div>Dashboard</div></div>`;
-  a.innerHTML=h;bindAll();if(tab==='dash')drawDashChart();if(vw==='detail'&&sid)drawMini();
-}
+  a.innerHTML=h;bindAll();if(tab==='dash')drawDashChart();if(vw==='detail'&&sid)drawMini()}
 
 function gf(){const q=sq.toLowerCase();return C.filter(c=>{const m=!q||Object.values(c).some(v=>typeof v==='string'&&v.toLowerCase().includes(q));const t=!ft||(c.tags&&c.tags.toLowerCase().includes(ft.toLowerCase()));return m&&t}).sort((a,b)=>{if(so==='fav')return(b.fav?1:0)-(a.fav?1:0);if(so==='debt')return totalPending(b)-totalPending(a);if(so==='ca')return totalCA(b)-totalCA(a);return(a[so]||'').toLowerCase().localeCompare((b[so]||'').toLowerCase())})}
-function aTags(){return[...new Set(C.flatMap(c=>c.tags?c.tags.split(',').map(t=>t.trim()).filter(Boolean):[]))]}
 
-function rList(){const f=gf(),tg=aTags();let items='';if(!f.length){items=C.length?'<div class="empty"><div class="ei">🔍</div>Aucun résultat</div>':'<div class="empty"><div class="ei">📋</div><div>Aucun contact</div></div>'}else{items=f.map(c=>{const p=pendByCur(c),pK=Object.keys(p),bg=pK.map(k=>`<div class="debt-badge debt-r">${fmt(p[k])} ${CUR_SYM[k]}</div>`).join(''),ca=totalCA(c);return`<div class="cc anim" data-id="${c.id}"><div class="av">${(c.prenom?.[0]||c.nom?.[0]||'?').toUpperCase()}</div><div class="ci"><div class="cn">${c.fav?'⭐ ':''}${E(c.prenom)} ${E(c.nom)}</div><div class="cs">${E([c.entreprise,c.villeTravail].filter(Boolean).join(' · '))||'—'}</div></div><div class="cc-right">${ca?`<div class="pb">${fmt(ca)} €</div>`:''}${c.pourcentage?`<div class="pb" style="background:var(--b2);color:var(--b)">${E(c.pourcentage)}%</div>`:''}${bg}${!pK.length&&(c.invoices||[]).length?'<div class="debt-badge debt-g">✅</div>':''}</div></div>`}).join('')}const to=tg.map(t=>`<option value="${E(t)}" ${ft===t?'selected':''}>${E(t)}</option>`).join('');
-  return`<div class="vw anim"><div class="sbar"><input class="sinp" id="si" placeholder="🔍  Rechercher..." value="${E(sq)}"></div><div class="flts"><select class="fsel" id="ss"><option value="nom" ${so==='nom'?'selected':''}>Nom</option><option value="fav" ${so==='fav'?'selected':''}>⭐ Favoris</option><option value="ca" ${so==='ca'?'selected':''}>📈 CA</option><option value="debt" ${so==='debt'?'selected':''}>💸 Dettes</option><option value="entreprise" ${so==='entreprise'?'selected':''}>Entreprise</option></select>${tg.length?`<select class="fsel" id="ts"><option value="">Tous</option>${to}</select>`:''}</div><div class="clist">${items}</div></div>`}
+function rList(){const f=gf(),tg=[...new Set(C.flatMap(c=>c.tags?c.tags.split(',').map(t=>t.trim()).filter(Boolean):[]))];let items='';if(!f.length)items=C.length?'<div class="empty"><div class="ei">🔍</div>Aucun résultat</div>':'<div class="empty"><div class="ei">📋</div>Aucun contact</div>';else items=f.map(c=>{const p=pendByCur(c),pK=Object.keys(p),bg=pK.map(k=>`<div class="debt-badge debt-r">${fmt(p[k])} ${CUR_SYM[k]}</div>`).join(''),ca=totalCA(c);return`<div class="cc anim" data-id="${c.id}"><div class="av">${(c.prenom?.[0]||c.nom?.[0]||'?').toUpperCase()}</div><div class="ci"><div class="cn">${c.fav?'⭐ ':''}${E(c.prenom)} ${E(c.nom)}</div><div class="cs">${E([c.entreprise,c.villeTravail].filter(Boolean).join(' · '))||'—'}</div></div><div class="cc-right">${ca?`<div class="pb">${fmt(ca)} €</div>`:''}${c.pourcentage?`<div class="pb" style="background:var(--b2);color:var(--b)">${E(c.pourcentage)}%</div>`:''}${bg}${!pK.length&&(c.invoices||[]).length?'<div class="debt-badge debt-g">✅</div>':''}</div></div>`}).join('');
+  return`<div class="vw anim"><div class="sbar"><input class="sinp" id="si" placeholder="🔍  Rechercher..." value="${E(sq)}"></div><div class="flts"><select class="fsel" id="ss"><option value="nom"${so==='nom'?' selected':''}>Nom</option><option value="fav"${so==='fav'?' selected':''}>⭐ Favoris</option><option value="ca"${so==='ca'?' selected':''}>📈 CA</option><option value="debt"${so==='debt'?' selected':''}>💸 Dettes</option><option value="entreprise"${so==='entreprise'?' selected':''}>Entreprise</option></select>${tg.length?`<select class="fsel" id="ts"><option value="">Tous</option>${tg.map(t=>`<option value="${E(t)}"${ft===t?' selected':''}>${E(t)}</option>`).join('')}</select>`:''}</div><div class="clist">${items}</div></div>`}
 
-function rDetail(){const c=C.find(x=>x.id===sid);if(!c)return'';const tgs=c.tags?c.tags.split(',').map(t=>t.trim()).filter(Boolean):[];const fields=SECS.flatMap(s=>s.f).filter(f=>f.k!=='notes'&&f.k!=='tags'&&c[f.k]).map(f=>{let v=E(c[f.k]);if(f.sx)v+=f.sx;return`<div class="fc"><div class="fi">${f.i}</div><div><div class="fl">${f.l}</div><div class="fv">${v}</div></div></div>`}).join('');const invs=c.invoices||[],pend=pendByCur(c),pK=Object.keys(pend);const totH=pK.length?pK.map(k=>`<div class="inv-total-chip"><div class="inv-total-label">Dû ${k}</div><div class="inv-total-val">${fmt(pend[k])} ${CUR_SYM[k]}</div></div>`).join(''):'<div class="inv-total-chip"><div class="inv-total-val zero">✅</div></div>';const invH=invs.map((inv,i)=>`<div class="inv-card"><div class="inv-left"><div class="inv-desc">${E(inv.desc||'Facture')}</div><div class="inv-date">${E(inv.date||'')}</div></div><div class="inv-right"><div class="inv-amt" style="color:${inv.paid?'var(--g)':'var(--r)'}">${fmt(inv.amount)}</div><div class="inv-cur ${CUR_CLS[inv.currency]||'cur-eur'}">${inv.currency||'EUR'}</div><div class="inv-status ${inv.paid?'inv-paid':'inv-pending'}" data-ti="${i}">${inv.paid?'✅':'⏳'}</div><div class="inv-del" data-di="${i}">🗑️</div></div></div>`).join('');const mo=(c.monthly||[]).sort((a,b)=>a.date>b.date?-1:1),tCa=mo.reduce((s,m)=>s+Number(m.amount||0),0),avg=mo.length?tCa/mo.length:0;const mH=mo.map((m,i)=>`<div class="mth-card"><div class="mth-month">${fmtM(m.date)}</div><div style="display:flex;align-items:center;gap:8px"><div class="mth-amt">${Number(m.amount).toLocaleString('fr')} €</div><div class="inv-del" data-mi="${i}">🗑️</div></div></div>`).join('');const dH=dc===c.id?`<div style="display:flex;gap:4px"><button class="btn btn-r" id="cY" style="padding:4px 10px;font-size:11px">Oui</button><button class="btn btn-o" id="cN" style="padding:4px 10px;font-size:11px">Non</button></div>`:`<button class="btn btn-r" id="dB" style="padding:5px 8px;font-size:12px">🗑️</button>`;
-  return`<div class="vw anim"><div class="dhdr"><button class="btn btn-o" id="bB" style="padding:5px 11px;font-size:12px">← Retour</button><div class="dacts"><button style="font-size:18px;background:none;border:none;cursor:pointer;padding:4px" id="togFav">${c.fav?'⭐':'☆'}</button><button class="btn btn-s" id="eB" style="padding:5px 11px;font-size:12px">✏️</button>${dH}</div></div><div class="pcard"><div class="av lg">${(c.prenom?.[0]||c.nom?.[0]||'?').toUpperCase()}</div><div><div class="pname">${c.fav?'⭐ ':''}${E(c.prenom)} ${E(c.nom)}</div><div class="prole">${E([c.poste,c.entreprise].filter(Boolean).join(' — '))||'—'}</div>${tgs.length?`<div class="trow">${tgs.map(t=>`<span class="tg">${E(t)}</span>`).join('')}</div>`:''}</div></div><div class="fgrid">${fields}</div>${c.notes?`<div class="nbox"><div style="font-size:12px;font-weight:700;color:var(--t1);margin-bottom:5px">📝 Notes</div><div style="font-size:12px;color:var(--t3);white-space:pre-wrap;line-height:1.6">${E(c.notes)}</div></div>`:''}<div class="sec"><div class="sec-t">🧾 Factures (${invs.length})</div><div class="inv-totals">${totH}</div>${invH}<div class="add-inv"><div class="add-inv-title">+ Facture</div><div class="add-row"><div class="fg w1"><label class="flab">Desc</label><input class="finp" id="iD" value="${E(iDesc)}" placeholder="Commission"></div><div class="fg w2"><label class="flab">Montant</label><input class="finp" type="number" id="iA" value="${iAmt}" placeholder="0"></div></div><div class="add-row"><div class="fg w2"><label class="flab">Devise</label><select class="finp" id="iC">${CURS.map(c=>`<option value="${c}" ${iCur===c?'selected':''}>${c}</option>`).join('')}</select></div><div class="fg w2"><label class="flab">Statut</label><div class="paid-toggle"><div class="pt-opt ${!iPaid?'act-r':''}" id="iPR">⏳</div><div class="pt-opt ${iPaid?'act-g':''}" id="iPG">✅</div></div></div><div class="fg" style="justify-content:flex-end"><button class="btn btn-g" id="addI" style="padding:9px 16px">+</button></div></div></div></div>${mo.length?`<div class="chart-box"><div style="font-size:12px;font-weight:700;color:var(--t1);margin-bottom:8px">📈 CA</div><canvas id="miniC" height="140"></canvas></div>`:''}<div class="sec"><div class="sec-t">📈 CA (${mo.length})</div>${mo.length?`<div class="mth-total"><div><div class="mth-total-label">CA Total</div><div class="mth-total-val">${fmt(tCa)} €</div></div><div class="mth-avg">Moy: ${fmt(avg)} €/mois</div></div>`:''}${mH}<div class="add-mth"><div style="font-size:11px;font-weight:700;color:var(--y);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">+ Mois</div><div style="display:flex;gap:8px;margin-bottom:10px"><div class="fg" style="flex:1"><label class="flab">Mois</label><input class="finp" type="month" id="mMi" value="${mM}"></div><div class="fg" style="flex:1"><label class="flab">CA €</label><input class="finp" type="number" id="mAi" value="${mA}" placeholder="0"></div></div><div style="display:flex;justify-content:flex-end"><button class="btn btn-g" id="addM" style="padding:8px 20px">📈 +</button></div></div></div></div>`}
+function rDetail(){const c=C.find(x=>x.id===sid);if(!c)return'';const tgs=c.tags?c.tags.split(',').map(t=>t.trim()).filter(Boolean):[];const flds=SECS.flatMap(s=>s.f).filter(f=>f.k!=='notes'&&f.k!=='tags'&&c[f.k]).map(f=>{let v=E(c[f.k]);if(f.sx)v+=f.sx;return`<div class="fc"><div class="fi">${f.i}</div><div><div class="fl">${f.l}</div><div class="fv">${v}</div></div></div>`}).join('');const invs=c.invoices||[],pnd=pendByCur(c),pK=Object.keys(pnd);const tH=pK.length?pK.map(k=>`<div class="inv-total-chip"><div class="inv-total-label">Dû ${k}</div><div class="inv-total-val">${fmt(pnd[k])} ${CUR_SYM[k]}</div></div>`).join(''):'<div class="inv-total-chip"><div class="inv-total-val zero">✅</div></div>';const iH=invs.map((inv,i)=>`<div class="inv-card"><div class="inv-left"><div class="inv-desc">${E(inv.desc||'Facture')}</div><div class="inv-date">${E(inv.date||'')}</div></div><div class="inv-right"><div class="inv-amt" style="color:${inv.paid?'var(--g)':'var(--r)'}">${fmt(inv.amount)}</div><div class="inv-cur ${CUR_CLS[inv.currency]||'cur-eur'}">${inv.currency||'EUR'}</div><div class="inv-status ${inv.paid?'inv-paid':'inv-pending'}" data-ti="${i}">${inv.paid?'✅':'⏳'}</div><div class="inv-del" data-di="${i}">🗑️</div></div></div>`).join('');const mo=(c.monthly||[]).sort((a,b)=>a.date>b.date?-1:1),tCa=mo.reduce((s,m)=>s+Number(m.amount||0),0),avg=mo.length?tCa/mo.length:0;const mH=mo.map((m,i)=>`<div class="mth-card"><div class="mth-month">${fmtM(m.date)}</div><div style="display:flex;align-items:center;gap:8px"><div class="mth-amt">${Number(m.amount).toLocaleString('fr')} €</div><div class="inv-del" data-mi="${i}">🗑️</div></div></div>`).join('');const dH=dc===c.id?`<div style="display:flex;gap:4px"><button class="btn btn-r" id="cY" style="padding:4px 10px;font-size:11px">Oui</button><button class="btn btn-o" id="cN" style="padding:4px 10px;font-size:11px">Non</button></div>`:`<button class="btn btn-r" id="dB" style="padding:5px 8px;font-size:12px">🗑️</button>`;
+  return`<div class="vw anim"><div class="dhdr"><button class="btn btn-o" id="bB" style="padding:5px 11px;font-size:12px">← Retour</button><div class="dacts"><button style="font-size:18px;background:none;border:none;cursor:pointer;padding:4px" id="togFav">${c.fav?'⭐':'☆'}</button><button class="btn btn-s" id="eB" style="padding:5px 11px;font-size:12px">✏️</button>${dH}</div></div><div class="pcard"><div class="av lg">${(c.prenom?.[0]||c.nom?.[0]||'?').toUpperCase()}</div><div><div class="pname">${c.fav?'⭐ ':''}${E(c.prenom)} ${E(c.nom)}</div><div class="prole">${E([c.poste,c.entreprise].filter(Boolean).join(' — '))||'—'}</div>${tgs.length?`<div class="trow">${tgs.map(t=>`<span class="tg">${E(t)}</span>`).join('')}</div>`:''}</div></div><div class="fgrid">${flds}</div>${c.notes?`<div class="nbox"><div style="font-size:12px;font-weight:700;color:var(--t1);margin-bottom:5px">📝 Notes</div><div style="font-size:12px;color:var(--t3);white-space:pre-wrap;line-height:1.6">${E(c.notes)}</div></div>`:''}<div class="sec"><div class="sec-t">🧾 Factures (${invs.length})</div><div class="inv-totals">${tH}</div>${iH}<div class="add-inv"><div class="add-inv-title">+ Facture</div><div class="add-row"><div class="fg w1"><label class="flab">Desc</label><input class="finp" id="iD" value="${E(iDesc)}" placeholder="Commission"></div><div class="fg w2"><label class="flab">Montant</label><input class="finp" type="number" id="iA" value="${iAmt}" placeholder="0"></div></div><div class="add-row"><div class="fg w2"><label class="flab">Devise</label><select class="finp" id="iC">${CURS.map(c=>`<option value="${c}"${iCur===c?' selected':''}>${c}</option>`).join('')}</select></div><div class="fg w2"><label class="flab">Statut</label><div class="paid-toggle"><div class="pt-opt ${!iPaid?'act-r':''}" id="iPR">⏳</div><div class="pt-opt ${iPaid?'act-g':''}" id="iPG">✅</div></div></div><div class="fg" style="justify-content:flex-end"><button class="btn btn-g" id="addI" style="padding:9px 16px">+</button></div></div></div></div>${mo.length?`<div class="chart-box"><div style="font-size:12px;font-weight:700;color:var(--t1);margin-bottom:8px">📈 CA</div><canvas id="miniC" height="140"></canvas></div>`:''}<div class="sec"><div class="sec-t">📈 CA (${mo.length})</div>${mo.length?`<div class="mth-total"><div><div class="mth-total-label">CA Total</div><div class="mth-total-val">${fmt(tCa)} €</div></div><div class="mth-avg">Moy: ${fmt(avg)} €/mois</div></div>`:''}${mH}<div class="add-mth"><div style="font-size:11px;font-weight:700;color:var(--y);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">+ Mois</div><div style="display:flex;gap:8px;margin-bottom:10px"><div class="fg" style="flex:1"><label class="flab">Mois</label><input class="finp" type="month" id="mMi" value="${mM}"></div><div class="fg" style="flex:1"><label class="flab">CA €</label><input class="finp" type="number" id="mAi" value="${mA}" placeholder="0"></div></div><div style="display:flex;justify-content:flex-end"><button class="btn btn-g" id="addM" style="padding:8px 20px">📈 +</button></div></div></div></div>`}
 
 function rForm(){const c=ed,nw=!C.find(x=>x.id===c.id);return`<div class="vw anim"><div class="fhdr"><button class="btn btn-o" id="fBk" style="padding:5px 11px;font-size:12px">← Annuler</button><span class="ftitle">${nw?'Nouveau':'Modifier'}</span></div><div class="fbody">${SECS.map(s=>`<div class="fsec"><div class="fstitle">${s.s}</div><div class="fgr">${s.f.map(f=>{const v=E(c[f.k]||''),fc=f.fu?'fg full':'fg';return f.t==='textarea'?`<div class="${fc}"><label class="flab">${f.i} ${f.l}</label><textarea class="finp" data-f="${f.k}" placeholder="${f.ph||''}">${v}</textarea></div>`:`<div class="${fc}"><label class="flab">${f.i} ${f.l}</label><input class="finp" type="${f.t}" data-f="${f.k}" value="${v}" placeholder="${f.ph||''}"></div>`}).join('')}</div></div>`).join('')}<div class="facts"><button class="btn btn-o" id="fCa">Annuler</button><button class="btn btn-g" id="fSv">💾 Enregistrer</button></div></div></div>`}
 
 function rDash(){const tc=C.length,fv=C.filter(c=>c.fav).length;const pBC={};C.flatMap(c=>c.invoices||[]).filter(i=>!i.paid).forEach(i=>{const k=i.currency||'EUR';pBC[k]=(pBC[k]||0)+Number(i.amount||0)});const aM=C.flatMap(c=>c.monthly||[]),tCA=aM.reduce((s,m)=>s+Number(m.amount||0),0);const pC=Object.keys(pBC).map(k=>`<div class="dc"><div class="dc-icon">🧾</div><div class="dc-val red">${fmt(pBC[k])}</div><div class="dc-lab">Dû ${k}</div></div>`).join('');const bCA=C.map(c=>({c,ca:totalCA(c)})).filter(d=>d.ca>0).sort((a,b)=>b.ca-a.ca).slice(0,5);const caH=bCA.map((d,i)=>`<div class="top-item"><div class="top-rank">#${i+1}</div><div class="top-info"><div class="top-name">${E(d.c.prenom)} ${E(d.c.nom)}</div><div class="top-sub">${E(d.c.entreprise)||'—'}</div></div><div style="font-size:14px;font-weight:700;color:var(--y);font-family:'JetBrains Mono',monospace">${fmt(d.ca)} €</div></div>`).join('');const drs=C.map(c=>({c,d:pendByCur(c)})).filter(d=>Object.keys(d.d).length).sort((a,b)=>totalPending(b.c)-totalPending(a.c)).slice(0,5);const dH=drs.map((d,i)=>`<div class="top-item"><div class="top-rank">#${i+1}</div><div class="top-info"><div class="top-name">${E(d.c.prenom)} ${E(d.c.nom)}</div></div><div>${Object.keys(d.d).map(k=>`<span style="color:${CUR_CLR[k]};font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace">${fmt(d.d[k])}${CUR_SYM[k]}</span>`).join('+')}</div></div>`).join('');const bM={};aM.forEach(m=>{bM[m.date||'?']=(bM[m.date||'?']||0)+Number(m.amount||0)});
   return`<div class="vw anim"><div class="dash"><div class="dash-cards"><div class="dc"><div class="dc-icon">👥</div><div class="dc-val green">${tc}</div><div class="dc-lab">Contacts</div></div><div class="dc"><div class="dc-icon">⭐</div><div class="dc-val yellow">${fv}</div><div class="dc-lab">Favoris</div></div><div class="dc"><div class="dc-icon">📈</div><div class="dc-val yellow">${fmt(tCA)} €</div><div class="dc-lab">CA Total</div></div><div class="dc"><div class="dc-icon">📊</div><div class="dc-val blue">${aM.length?fmt(tCA/new Set(aM.map(m=>m.date)).size):0} €</div><div class="dc-lab">CA Moy</div></div>${pC}</div>${Object.keys(bM).length?`<div class="dash-chart"><h3>📈 CA</h3><canvas id="dashC" height="200"></canvas></div>`:''}${bCA.length?`<div class="dash-section"><h3>🏆 Top CA</h3>${caH}</div>`:''}${drs.length?`<div class="dash-section"><h3>🧾 Débiteurs</h3>${dH}</div>`:''}</div></div>`}
 
-function rSettings(){const conf=getSyncConf(),hasSy=conf.url&&conf.code,hasTfa=!!totpSecret;const sTxt=!hasSy?'Off':syncState==='synced'?'✅ OK':'⏳';
+function rSettings(){const conf=getSyncConf(),hasSy=conf.url&&conf.code,hasTfa=!!totpSecret;
   return`<div class="sov ${stg?'':'hide'}" id="sO"><div class="span"><div class="shandle"></div><div style="font-size:15px;font-weight:700;color:var(--t1);margin-bottom:14px">⚙️ Paramètres</div>
-    <div class="sec-box"><div class="sec-box-title" style="color:var(--g)">🔐 Sécurité</div><div style="font-size:11px;color:var(--t3);margin-bottom:8px">AES-256-GCM • PBKDF2 200k • Login Firebase</div>
+    <div class="sec-box"><div class="sec-box-title" style="color:var(--g)">🔐 Sécurité</div><div style="font-size:11px;color:var(--t3);margin-bottom:8px">AES-256 • PBKDF2 200k • Auto-lock 2min</div>
       <button class="btn btn-s" id="chP" style="width:100%;padding:10px;margin-bottom:6px">🔑 Changer le code</button>
       <div style="font-size:12px;color:var(--t2);margin:10px 0 6px">${hasTfa?'<span style="color:var(--g);font-weight:700">🛡️ 2FA activé</span>':'2FA non activé'}</div>
       ${hasTfa?`<button class="btn btn-r" id="tfa2Off" style="width:100%;padding:10px">Désactiver 2FA</button>`:`<button class="btn btn-g" id="tfa2On" style="width:100%;padding:10px">🔑 Activer 2FA</button>`}</div>
-    <div class="sec-box"><div class="sec-box-title" style="color:var(--r)">🚨 Tentatives d'intrusion</div>
-      <button class="btn btn-r" id="loadLogs" style="width:100%;padding:10px;margin-bottom:8px;background:var(--r2);border:1px solid var(--r3)">📋 Charger le journal</button>
-      <div id="logList" style="max-height:250px;overflow-y:auto"></div></div>
-    <div class="sync-box"><div class="sync-title">☁️ Sync (chiffré)</div><div class="sync-status"><div class="sync-dot ${hasSy?(syncState==='synced'?'sync-on':'sync-off'):'sync-off'}"></div><span style="font-size:12px;color:var(--t2)">${sTxt}</span></div>
-      <div class="fg" style="margin-bottom:8px"><label class="flab">URL Firebase</label><input class="finp" id="syUrl" value="${E(conf.url||'')}" placeholder="https://xxx.firebaseio.com"></div>
+    <div class="sec-box"><div class="sec-box-title" style="color:var(--r)">🚨 Tentatives d'intrusion</div><button class="btn btn-r" id="loadLogs" style="width:100%;padding:10px;margin-bottom:8px;background:var(--r2);border:1px solid var(--r3)">📋 Charger le journal</button><div id="logList" style="max-height:250px;overflow-y:auto"></div></div>
+    <div class="sync-box"><div class="sync-title">☁️ Sync (chiffré)</div><div class="sync-status"><div class="sync-dot ${hasSy?(syncState==='synced'?'sync-on':'sync-off'):'sync-off'}"></div><span style="font-size:12px;color:var(--t2)">${!hasSy?'Off':syncState==='synced'?'✅ OK':'⏳'}</span></div>
+      <div class="fg" style="margin-bottom:8px"><label class="flab">URL </label><input class="finp" id="syUrl" value="${E(conf.url||'')}" placeholder="https://xxx.firebaseio.com"></div>
       <div class="fg" style="margin-bottom:8px"><label class="flab">Code sync</label><input class="finp" id="syCode" value="${E(conf.code||'')}" placeholder="code"></div>
       <div style="display:flex;gap:6px"><button class="btn btn-b" id="sySave" style="flex:1;padding:10px">💾</button>${hasSy?`<button class="btn btn-g" id="sySync" style="flex:1;padding:10px">🔄 Sync</button>`:''}</div></div>
     <button class="btn btn-s" id="impTg" style="width:100%;margin-top:10px;padding:10px">📱 Telegram</button>
@@ -513,7 +319,7 @@ function rImpModal(){if(!impModal)return'<div class="imp-modal hide"></div>';con
 function drawDashChart(){const aM=C.flatMap(c=>c.monthly||[]);const bM={};aM.forEach(m=>{bM[m.date||'?']=(bM[m.date||'?']||0)+Number(m.amount||0)});const ks=Object.keys(bM).sort();if(!ks.length)return;const cv=document.getElementById('dashC');if(!cv)return;const ctx=cv.getContext('2d');const W=cv.parentElement.clientWidth-28;cv.width=W*2;cv.height=400;ctx.scale(2,2);const h=160,pad=35,mx=Math.max(...ks.map(k=>bM[k]),1),gap=(W-pad*2)/ks.length,bw=Math.min(30,gap*.65);for(let i=0;i<=4;i++){const y=pad+h-h*(i/4);ctx.strokeStyle='#1c2733';ctx.lineWidth=.5;ctx.beginPath();ctx.moveTo(pad,y);ctx.lineTo(W-5,y);ctx.stroke();ctx.fillStyle='#4e5d6e';ctx.font='8px JetBrains Mono';ctx.textAlign='right';ctx.fillText(fmt(mx*i/4),pad-4,y+3)}ks.forEach((k,i)=>{const x=pad+gap*i+gap/2,bh=bM[k]/mx*h;const gr=ctx.createLinearGradient(0,pad+h-bh,0,pad+h);gr.addColorStop(0,'#f1c40f');gr.addColorStop(1,'#e67e22');ctx.fillStyle=gr;ctx.beginPath();ctx.roundRect(x-bw/2,pad+h-bh,bw,bh,4);ctx.fill();ctx.fillStyle='#7e8d9e';ctx.font='8px Inter';ctx.textAlign='center';ctx.fillText(fmtM(k),x,pad+h+12);ctx.fillStyle='#f0f2f5';ctx.font='bold 9px JetBrains Mono';ctx.fillText(fmt(bM[k]),x,pad+h-bh-5)})}
 function drawMini(){const c=C.find(x=>x.id===sid);if(!c)return;const mo=(c.monthly||[]).sort((a,b)=>a.date>b.date?1:-1);if(!mo.length)return;const cv=document.getElementById('miniC');if(!cv)return;const ctx=cv.getContext('2d');const W=cv.parentElement.clientWidth-28;cv.width=W*2;cv.height=280;ctx.scale(2,2);const h=100,pad=30,mx=Math.max(...mo.map(m=>Number(m.amount||0)),1),gap=(W-pad*2)/Math.max(mo.length-1,1);for(let i=0;i<=3;i++){const y=pad+h-h*(i/3);ctx.strokeStyle='#1c2733';ctx.lineWidth=.5;ctx.beginPath();ctx.moveTo(pad,y);ctx.lineTo(W-5,y);ctx.stroke();ctx.fillStyle='#4e5d6e';ctx.font='8px JetBrains Mono';ctx.textAlign='right';ctx.fillText(fmt(mx*i/3),pad-4,y+3)}ctx.beginPath();ctx.moveTo(pad,pad+h);mo.forEach((m,i)=>ctx.lineTo(pad+gap*i,pad+h-Number(m.amount||0)/mx*h));ctx.lineTo(pad+gap*(mo.length-1),pad+h);ctx.closePath();const gr=ctx.createLinearGradient(0,pad,0,pad+h);gr.addColorStop(0,'rgba(241,196,15,0.2)');gr.addColorStop(1,'rgba(241,196,15,0)');ctx.fillStyle=gr;ctx.fill();ctx.beginPath();mo.forEach((m,i)=>{const x=pad+gap*i,y=pad+h-Number(m.amount||0)/mx*h;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y)});ctx.strokeStyle='#f1c40f';ctx.lineWidth=2.5;ctx.stroke();mo.forEach((m,i)=>{const x=pad+gap*i,y=pad+h-Number(m.amount||0)/mx*h;ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fillStyle='#f1c40f';ctx.fill();ctx.beginPath();ctx.arc(x,y,2,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();ctx.fillStyle='#7e8d9e';ctx.font='8px Inter';ctx.textAlign='center';ctx.fillText(fmtM(m.date),x,pad+h+12);ctx.fillStyle='#f0f2f5';ctx.font='bold 8px JetBrains Mono';ctx.fillText(fmt(m.amount),x,y-8)})}
 
-/* ===== BIND APP ===== */
+/* ===== BIND ===== */
 function bindAll(){
   document.querySelectorAll('.nav-item').forEach(n=>n.onclick=()=>{tab=n.dataset.tab;vw=tab==='dash'?'dash':'list';sid=null;ra()});
   Q('#sB',e=>e.onclick=()=>{stg=true;ra()});Q('#aB',e=>e.onclick=()=>{ed=mkN();vw='form';ra()});
@@ -523,26 +329,17 @@ function bindAll(){
   Q('#chpwInp',e=>{e.onkeydown=ev=>{if(ev.key==='Enter')doChpw()}});Q('#chpwOk',e=>e.onclick=doChpw);
   Q('#tfa2On',e=>e.onclick=()=>{tfaSetupSecret=genSecret();tfaModal=true;stg=false;ra();focusEl('tfaVInp')});
   Q('#tfa2Off',e=>e.onclick=async()=>{if(confirm('Désactiver 2FA?')){totpSecret=null;await saveTOTP(null);tt('2FA off');ra()}});
-  Q('#loadLogs',e=>e.onclick=async()=>{
-    e.textContent='⏳...';const logs=await fetchIntrusionLog();const el=document.getElementById('logList');
-    if(!logs.length){el.innerHTML='<div style="font-size:12px;color:var(--g);padding:10px;text-align:center">✅ Aucune tentative</div>';e.textContent='📋 Charger le journal';return}
-    el.innerHTML=logs.map(l=>{const d=new Date(l.time);const date=d.toLocaleDateString('fr',{day:'2-digit',month:'short',year:'2-digit'});const time=d.toLocaleTimeString('fr',{hour:'2-digit',minute:'2-digit'});const dev=l.ua?.includes('iPhone')?'📱 iPhone':l.ua?.includes('Android')?'📱 Android':l.ua?.includes('Mac')?'💻 Mac':l.ua?.includes('Windows')?'💻 Windows':'🖥️ Autre';
-      return`<div style="background:var(--r2);border:1px solid var(--r3);border-radius:10px;padding:10px;margin-bottom:6px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span style="font-size:13px;font-weight:700;color:var(--r);font-family:'JetBrains Mono',monospace">"${E(l.login)}"</span><span style="font-size:10px;color:var(--t4)">${dev}</span></div><div style="font-size:10px;color:var(--t4)">${date} à ${time} • ${E(l.screen||'')} • ${E(l.lang||'')}</div></div>`}).join('')
-      +`<button class="btn btn-o" id="clearLogs" style="width:100%;margin-top:8px;padding:8px;font-size:11px">🗑️ Effacer le journal</button>`;
-    e.textContent='📋 Charger le journal';
-    Q('#clearLogs',el=>el.onclick=async()=>{if(confirm('Effacer le journal?')){await clearIntrusionLog();document.getElementById('logList').innerHTML='<div style="font-size:12px;color:var(--g);padding:10px;text-align:center">✅ Journal effacé</div>'}});
-  });
+  Q('#loadLogs',e=>e.onclick=async()=>{e.textContent='⏳...';const logs=await fetchLogs();const el=document.getElementById('logList');if(!logs.length){el.innerHTML='<div style="font-size:12px;color:var(--g);padding:10px;text-align:center">✅ Aucune tentative</div>';e.textContent='📋 Charger';return}el.innerHTML=logs.map(l=>{const d=new Date(l.time),dt=d.toLocaleDateString('fr',{day:'2-digit',month:'short'}),tm=d.toLocaleTimeString('fr',{hour:'2-digit',minute:'2-digit'}),dv=l.ua?.includes('iPhone')?'📱iPhone':l.ua?.includes('Android')?'📱Android':l.ua?.includes('Mac')?'💻Mac':l.ua?.includes('Windows')?'💻Win':'🖥️';return`<div style="background:var(--r2);border:1px solid var(--r3);border-radius:10px;padding:10px;margin-bottom:6px"><div style="display:flex;justify-content:space-between"><span style="font-size:13px;font-weight:700;color:var(--r);font-family:'JetBrains Mono',monospace">"${E(l.login)}"</span><span style="font-size:10px;color:var(--t4)">${dv}</span></div><div style="font-size:10px;color:var(--t4)">${dt} ${tm} • ${E(l.screen||'')}</div></div>`}).join('')+'<button class="btn btn-o" id="clrLogs" style="width:100%;margin-top:8px;padding:8px;font-size:11px">🗑️ Effacer</button>';e.textContent='📋 Charger';Q('#clrLogs',b=>b.onclick=async()=>{if(confirm('Effacer?')){await clearLogs();el.innerHTML='<div style="font-size:12px;color:var(--g);padding:10px;text-align:center">✅ Effacé</div>'}})});
   Q('#tfaCancel',e=>e.onclick=()=>{tfaModal=false;ra()});
   Q('#tfaConfirm',e=>e.onclick=async()=>{const i=document.getElementById('tfaVInp'),err=document.getElementById('tfaVErr');const c=i?.value?.replace(/\D/g,'');if(!c||c.length!==6){if(err)err.textContent='6 chiffres';return}if(await verifyTOTP(tfaSetupSecret,c)){totpSecret=tfaSetupSecret;await saveTOTP(tfaSetupSecret);tfaModal=false;tt('🛡️ 2FA activé');ra()}else{if(err)err.textContent='Incorrect';if(i){i.value='';i.focus()}}});
-  Q('#tfaMod',e=>e.onclick=v=>{if(v.target===e){tfaModal=false;ra()}});
-  Q('#tfaVInp',e=>{e.oninput=()=>{e.value=e.value.replace(/\D/g,'').slice(0,6)}});
+  Q('#tfaMod',e=>e.onclick=v=>{if(v.target===e){tfaModal=false;ra()}});Q('#tfaVInp',e=>{e.oninput=()=>{e.value=e.value.replace(/\D/g,'').slice(0,6)}});
   Q('#sySave',e=>e.onclick=()=>{const u=document.getElementById('syUrl')?.value?.trim(),c=document.getElementById('syCode')?.value?.trim();if(!u||!c){tt('❌');return}setSyncConf({url:u,code:c});tt('💾');fullSync();stg=false;ra()});
   Q('#sySync',e=>e.onclick=()=>{fullSync();stg=false});
   Q('#impTg',e=>e.onclick=()=>{stg=false;impModal=true;impData=[];impSel=new Set();ra()});
   Q('#expB',e=>e.onclick=()=>{const b=new Blob([JSON.stringify(C,null,2)],{type:'application/json'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=`crm_${new Date().toISOString().split('T')[0]}.json`;a.click();URL.revokeObjectURL(u);tt('📤')});
-  Q('#impF',e=>e.onchange=ev=>{const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=async e=>{try{const d=JSON.parse(e.target.result);if(Array.isArray(d)){let n=0;d.forEach(i=>{if(!C.find(c=>c.id===i.id)){C.push(i);n++}});await sv();stg=false;tt(`📥 ${n}`);ra()}}catch(err){tt('❌')}};r.readAsText(f);ev.target.value=''});
+  Q('#impF',e=>e.onchange=ev=>{const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=async e=>{try{const d=JSON.parse(e.target.result);if(Array.isArray(d)){let n=0;d.forEach(i=>{if(!C.find(c=>c.id===i.id)){C.push(i);n++}});await sv();stg=false;tt(`📥 ${n}`);ra()}}catch(er){tt('❌')}};r.readAsText(f);ev.target.value=''});
   Q('#nukB',e=>e.onclick=async()=>{if(confirm('TOUT supprimer?')){C=[];await sv();sid=null;vw='list';stg=false;tt('🗑️');ra()}});
-  Q('#tgF',e=>e.onchange=ev=>{const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{try{const d=JSON.parse(e.target.result);let ct=[];if(d.contacts?.list)ct=d.contacts.list;else if(Array.isArray(d))ct=d;else if(d.contacts)ct=d.contacts;impData=ct.filter(c=>c.first_name||c.last_name||c.phone_number);impSel=new Set();ra()}catch(err){tt('❌')}};r.readAsText(f);ev.target.value=''});
+  Q('#tgF',e=>e.onchange=ev=>{const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{try{const d=JSON.parse(e.target.result);let ct=[];if(d.contacts?.list)ct=d.contacts.list;else if(Array.isArray(d))ct=d;else if(d.contacts)ct=d.contacts;impData=ct.filter(c=>c.first_name||c.last_name||c.phone_number);impSel=new Set();ra()}catch(er){tt('❌')}};r.readAsText(f);ev.target.value=''});
   Q('#clImp',e=>e.onclick=()=>{impModal=false;ra()});Q('#impMod',e=>e.onclick=v=>{if(v.target===e){impModal=false;ra()}});
   Q('#selA',e=>e.onclick=()=>{impSel=impSel.size===impData.length?new Set():new Set(impData.map((_,i)=>i));ra()});
   document.querySelectorAll('.imp-item').forEach(el=>el.onclick=()=>{const i=parseInt(el.dataset.ii);impSel.has(i)?impSel.delete(i):impSel.add(i);ra()});
@@ -567,14 +364,7 @@ function bindAll(){
   Q('#fSv',e=>e.onclick=async()=>{if(!ed||(!ed.nom&&!ed.prenom))return;ed.lastModified=new Date().toISOString();const x=C.findIndex(c=>c.id===ed.id);if(x>=0){ed.monthly=C[x].monthly||[];ed.invoices=C[x].invoices||[];C[x]={...ed}}else{ed.monthly=[];ed.invoices=[];C.push({...ed})}await sv();sid=ed.id;ed=null;vw='detail';tt('✅');ra()});
 }
 
-async function doChpw(){
-  const i=document.getElementById('chpwInp'),err=document.getElementById('chpwErr'),v=i?.value||'';
-  if(chpwStep===0){if(!await verifyPW(v)){if(err)err.textContent='Incorrect';i.value='';return}chpwStep=1;ra();focusEl('chpwInp')}
-  else if(chpwStep===1){if(v.length<8){if(err)err.textContent='Min 8';return}newPW=v;chpwStep=2;ra();focusEl('chpwInp')}
-  else if(chpwStep===2){if(v!==newPW){if(err)err.textContent='Différent';i.value='';return}
-    masterPW=v;localStorage.setItem(HK,await hashStr(v,getSalt()));await saveVault(C);if(totpSecret)await saveTOTP(totpSecret);
-    chpwModal=false;newPW='';chpwStep=0;tt('✅ Code changé');ra()}
-}
+async function doChpw(){const i=document.getElementById('chpwInp'),err=document.getElementById('chpwErr'),v=i?.value||'';if(chpwStep===0){if(!await verifyPW(v)){if(err)err.textContent='Incorrect';i.value='';return}chpwStep=1;ra();focusEl('chpwInp')}else if(chpwStep===1){if(v.length<8){if(err)err.textContent='Min 8';return}newPW=v;chpwStep=2;ra();focusEl('chpwInp')}else if(chpwStep===2){if(v!==newPW){if(err)err.textContent='Différent';i.value='';return}masterPW=v;localStorage.setItem(HK,await hashStr(v,getSalt()));await saveVault(C);if(totpSecret)await saveTOTP(totpSecret);chpwModal=false;newPW='';chpwStep=0;tt('✅ Code changé');ra()}}
 
 init();
 })();
