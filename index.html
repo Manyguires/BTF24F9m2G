@@ -210,21 +210,24 @@ function setLocalLoginHash(h){localStorage.setItem(LHK,h)}
 
 async function saveLoginToFB(login){
   const conf=getSyncConf();if(!conf.url||!conf.code)return false;
-  const h=await hashStr(login,getSalt());
-  setLocalLoginHash(h);
-  try{const r=await fetch(conf.url.replace(/\/$/,'')+'/auth/'+encodeURIComponent(conf.code)+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({h,t:Date.now()})});return r.ok}catch(e){return false}
+  const loginSalt=crypto.getRandomValues(new Uint8Array(16));
+  const lsB64=btoa(String.fromCharCode(...loginSalt));
+  const h=await hashStr(login,loginSalt);
+  setLocalLoginHash(h);localStorage.setItem('crm_login_salt',lsB64);
+  try{const r=await fetch(conf.url.replace(/\/$/,'')+'/auth/'+encodeURIComponent(conf.code)+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({h,salt:lsB64,t:Date.now()})});return r.ok}catch(e){return false}
 }
 async function verifyLogin(login){
-  const h=await hashStr(login,getSalt());
-  // Try Firebase first
   const conf=getSyncConf();
+  let storedHash=null,loginSalt=null;
+  // Try Firebase first
   if(conf.url&&conf.code){
-    try{const r=await fetch(conf.url.replace(/\/$/,'')+'/auth/'+encodeURIComponent(conf.code)+'.json');if(r.ok){const d=await r.json();if(d?.h){setLocalLoginHash(d.h);return d.h===h}}}catch(e){}
+    try{const r=await fetch(conf.url.replace(/\/$/,'')+'/auth/'+encodeURIComponent(conf.code)+'.json');if(r.ok){const d=await r.json();if(d?.h&&d?.salt){storedHash=d.h;loginSalt=Uint8Array.from(atob(d.salt),c=>c.charCodeAt(0));setLocalLoginHash(d.h);localStorage.setItem('crm_login_salt',d.salt)}}}catch(e){}
   }
-  // Fallback to local
-  const lh=getLocalLoginHash();
-  if(lh)return lh===h;
-  return false;
+  // Fallback local
+  if(!storedHash){storedHash=getLocalLoginHash();const ls=localStorage.getItem('crm_login_salt');if(ls)loginSalt=Uint8Array.from(atob(ls),c=>c.charCodeAt(0))}
+  if(!storedHash||!loginSalt)return false;
+  const h=await hashStr(login,loginSalt);
+  return h===storedHash;
 }
 function hasLogin(){return!!getLocalLoginHash()}
 
@@ -276,11 +279,15 @@ let setupLogin='',setupPW='';
 function showScreen(id){document.querySelectorAll('.lock-screen').forEach(s=>s.classList.remove('show'));document.getElementById(id)?.classList.add('show')}
 
 async function init(){
-  const hasV=!!getHash();const hasL=hasLogin();const conf=getSyncConf();
+  const conf=getSyncConf();
+  // Pull login hash from Firebase if not stored locally yet (new device)
+  if(!getLocalLoginHash()&&conf.url&&conf.code){
+    try{const r=await fetch(conf.url.replace(/\/$/,'')+'/auth/'+encodeURIComponent(conf.code)+'.json');if(r.ok){const d=await r.json();if(d?.h){setLocalLoginHash(d.h);if(d.salt)localStorage.setItem('crm_login_salt',d.salt)}}}catch(e){}
+  }
+  const hasV=!!getHash();const hasL=hasLogin();
   if(hasV&&hasL){pm='login';showScreen('scrLogin');focusEl('loginInp')}
   else if(hasV&&!hasL){pm='pw_unlock';showScreen('scrPW');setupNumpad('numpad');focusEl('pwInp')}
   else{
-    // New user or migration
     if(conf.url&&conf.code){pm='setup_login';showScreen('scrSetupLogin');focusEl('sLoginInp')}
     else{pm='setup_fb';showScreen('scrSetupFB');focusEl('setupFBUrl')}
   }
