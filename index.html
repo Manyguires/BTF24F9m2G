@@ -23,8 +23,8 @@ select{-webkit-appearance:none}::-webkit-scrollbar{width:0;height:0}
 .pw-inp{width:100%;background:var(--bg2);border:2px solid var(--border);border-radius:14px;padding:14px 50px 14px 16px;color:var(--t1);font-size:18px;font-weight:700;font-family:'JetBrains Mono',monospace;letter-spacing:3px;text-align:center;-webkit-text-security:disc}
 .pw-inp::placeholder{letter-spacing:0;font-size:12px;font-weight:400;-webkit-text-security:none}
 .pw-cnt{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:9px;font-family:'JetBrains Mono',monospace;pointer-events:none;padding:2px 5px;border-radius:4px}.pw-cnt.ok{color:var(--g);background:var(--g3)}.pw-cnt.no{color:var(--r);background:var(--r2)}
-.numpad{display:grid;grid-template-columns:repeat(3,68px);gap:8px;opacity:.3;pointer-events:none}
-.nk{width:68px;height:52px;border-radius:12px;border:1px solid var(--border);background:var(--bg2);color:var(--t1);font-size:22px;font-weight:600;display:flex;align-items:center;justify-content:center}
+.numpad{display:grid;grid-template-columns:repeat(3,68px);gap:8px}
+.nk{width:68px;height:52px;border-radius:12px;border:1px solid var(--border);background:var(--bg2);color:var(--t1);font-size:22px;font-weight:600;display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-user-select:none}.nk:active{background:var(--g3)}
 .lock-msg{font-size:12px;margin-top:8px;min-height:18px}.lock-msg.err{color:var(--r)}.lock-msg.ok{color:var(--g)}
 .totp-screen{display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center}.totp-screen.show{display:flex}
 .totp-input{width:200px;text-align:center;font-size:28px;font-weight:800;letter-spacing:12px;font-family:'JetBrains Mono',monospace;background:var(--bg2);border:2px solid var(--border);border-radius:14px;padding:14px;color:var(--t1);margin:14px 0}
@@ -99,7 +99,7 @@ select{-webkit-appearance:none}::-webkit-scrollbar{width:0;height:0}
 </head>
 <body>
 <div class="lock" id="lock">
-  <div id="pinScreen"><div style="font-size:52px;margin-bottom:18px">🔐</div><h2 id="lT">Entrer le code PIN</h2><p id="lS">Accès protégé</p><div class="pw-wrap" id="pwWrap"><input class="pw-inp" id="pwInp" type="password" autocomplete="off" placeholder="Mot de passe"><div class="pw-cnt no" id="pwCnt">0</div></div><div class="numpad" id="numpad"></div><div class="lock-msg" id="lM"></div><button class="btn btn-g" id="lBtn" style="margin-top:14px;padding:10px 30px">Déverrouiller</button></div>
+  <div id="pinScreen"><div style="font-size:52px;margin-bottom:18px">📱</div><h2 id="lT">Entrer le code PIN</h2><p id="lS">Accès protégé</p><div class="pw-wrap" id="pwWrap"><input class="pw-inp" id="pwInp" type="password" autocomplete="off" placeholder="Code d'accès"><div class="pw-cnt no" id="pwCnt">0</div></div><div class="numpad" id="numpad"></div><div class="lock-msg" id="lM"></div><button class="btn btn-g" id="lBtn" style="margin-top:14px;padding:10px 30px">Déverrouiller</button></div>
   <div class="totp-screen" id="totpScreen"><div style="font-size:52px;margin-bottom:14px">🔑</div><h2 style="color:var(--t1);margin-bottom:2px">2FA</h2><p style="color:var(--t3);font-size:12px;margin-bottom:6px">Code Google Authenticator</p><div class="totp-bar"><div class="totp-bar-fill" id="totpBar"></div></div><div class="totp-timer">Expire dans <span id="totpTime">30</span>s</div><input class="totp-input" id="totpInp" type="tel" maxlength="6" placeholder="000000" inputmode="numeric"><div class="totp-err" id="totpErr"></div><button class="btn btn-g" id="totpBtn" style="padding:10px 30px">Vérifier</button></div>
 </div>
 <div id="app"></div>
@@ -208,8 +208,20 @@ let pm='unlock',pe='',pl=true; // Always start locked
 let mM='',mA='',iDesc='',iAmt='',iCur='EUR',iPaid=false,totpTimer=null,totpSecret=null;
 
 async function init(){
-  if(isNewUser()){pm='setup';pe=''}
-  else{pm='unlock';pe=''}
+  if(getHash()){
+    // Vault already set up — normal unlock
+    pm='unlock';pe='';
+  } else {
+    // No vault yet — need to create password (migrates old data)
+    const oldPW=getOldPW();
+    if(oldPW){
+      // Has old PIN — verify identity first
+      pm='verify_old';pe='';
+    } else {
+      // Brand new user or no PIN — go straight to setup
+      pm='setup';pe='';
+    }
+  }
   rl();
 }
 
@@ -219,14 +231,14 @@ function rl(){
   if(!pl){el.classList.add('out');stopTotpTimer();return}el.classList.remove('out');
   if(pm==='totp'){pinS.style.display='none';totpS.classList.add('show');startTotpTimer();setTimeout(()=>document.getElementById('totpInp')?.focus(),100);return}
   pinS.style.display='';totpS.classList.remove('show');stopTotpTimer();
-  const isS=pm==='setup',isC=pm==='confirm';
-  document.getElementById('lT').textContent=isS?'Créer un mot de passe':isC?'Confirmer':'Entrer le code PIN';
-  document.getElementById('lS').textContent=isS?'Min. 8 caractères (lettres + chiffres)':isC?'Retapez le mot de passe':'Accès protégé';
+  const isS=pm==='setup',isC=pm==='confirm',isV=pm==='verify_old';
+  document.getElementById('lT').textContent=isV?'Entrer l\'ancien code':isS?'Créer un code':isC?'Confirmer le code':'Entrer le code';
+  document.getElementById('lS').textContent=isV?'Vérifie ton identité':isS?'Choisis un code d\'accès':isC?'Retapez le code':'Accès protégé';
   const msg=document.getElementById('lM');msg.textContent=pe;msg.className='lock-msg'+(pe?' err':'');
-  document.getElementById('lBtn').textContent=isS?'Suivant':isC?'Confirmer':'Déverrouiller';
+  document.getElementById('lBtn').textContent=isV?'Vérifier':isS?'Suivant':isC?'Confirmer':'OK';
   const pad=document.getElementById('numpad');pad.innerHTML='';
-  [1,2,3,4,5,6,7,8,9,'*',0,'#'].forEach(n=>{const b=document.createElement('div');b.className='nk';b.textContent=n;pad.appendChild(b)});
-  const inp=document.getElementById('pwInp');inp.value='';inp.placeholder=isS||isC?'Nouveau mot de passe':'Entrer le code';inp.focus();updatePwCnt();
+  [1,2,3,4,5,6,7,8,9,'*',0,'⌫'].forEach(n=>{const b=document.createElement('div');b.className='nk';b.textContent=n;if(n==='⌫'){b.style.fontSize='18px';b.onclick=()=>{const inp=document.getElementById('pwInp');if(inp){inp.value=inp.value.slice(0,-1);inp.dispatchEvent(new Event('input'));updatePwCnt()}}}else{b.onclick=()=>{const inp=document.getElementById('pwInp');if(inp){inp.value+=String(n);inp.dispatchEvent(new Event('input'));updatePwCnt()}}};pad.appendChild(b)});
+  const inp=document.getElementById('pwInp');inp.value='';inp.placeholder=isV?'Ancien code':'Code d\'accès';inp.focus();updatePwCnt();
 }
 function updatePwCnt(){const inp=document.getElementById('pwInp'),cnt=document.getElementById('pwCnt');if(!inp||!cnt)return;const l=inp.value.length;cnt.textContent=l;cnt.className='pw-cnt '+(l>=8?'ok':'no')}
 
@@ -242,15 +254,25 @@ async function pwSubmit(){
       if(totpSecret){pm='totp';rl();return}
       pe='';pl=false;rl();ra();
       const conf=getSyncConf();if(conf.url&&conf.code)fullSync();
-    }else{pe='Mot de passe incorrect';rl();document.getElementById('pwWrap')?.classList.add('shake')}
+    }else{pe='Code incorrect';rl();document.getElementById('pwWrap')?.classList.add('shake')}
+  }else if(pm==='verify_old'){
+    // Verify old PIN before allowing migration
+    const oldPW=getOldPW();
+    if(val===oldPW){pe='';pm='setup';rl();tt('✅ Identité vérifiée')}
+    else{pe='Ancien code incorrect';rl();document.getElementById('pwWrap')?.classList.add('shake')}
   }else if(pm==='setup'){
     if(val.length<8){pe='Minimum 8 caractères';rl();return}setupPW=val;pm='confirm';pe='';rl();
   }else if(pm==='confirm'){
     if(val===setupPW){
-      const old=getOldData()||[];
+      // Gather old data from all sources
+      let old=getOldData()||[];
+      if(!old.length){try{
+        const idb=await new Promise(r=>{try{const q=indexedDB.open('crm_master',1);q.onupgradeneeded=e=>{e.target.transaction.abort()};q.onsuccess=e=>{const d=e.target.result;try{const t=d.transaction('d','readonly');const g=t.objectStore('d').get('c');g.onsuccess=()=>{d.close();r(g.result&&Array.isArray(g.result)?g.result:null)};g.onerror=()=>{d.close();r(null)}}catch(err){d.close();r(null)}};q.onerror=()=>r(null)}catch(e){r(null)}});
+        if(idb&&idb.length)old=idb;
+      }catch(e){}}
       await setupVault(val,old);C=old;
       OLD_LS.forEach(k=>localStorage.removeItem(k));OLD_PK.forEach(k=>localStorage.removeItem(k));
-      pe='';pl=false;setupPW='';rl();ra();tt('🔐 Coffre-fort créé');
+      pe='';pl=false;setupPW='';rl();ra();tt('✅ Code activé');
     }else{pe='Ne correspond pas';pm='setup';setupPW='';rl();document.getElementById('pwWrap')?.classList.add('shake')}
   }
 }
@@ -274,7 +296,7 @@ async function sv(){await saveVault(C)}
 function ra(){
   const a=document.getElementById('app');let h='';const conf=getSyncConf(),hasSy=conf.url&&conf.code;
   const syncDot=hasSy?`<div class="sync-dot ${syncState==='synced'?'sync-on':syncState==='syncing'?'sync-ing':'sync-off'}"></div>`:'';
-  h+=`<div class="hdr"><div class="hdr-l"><span style="font-size:16px">🔒</span><span class="brand">My<span>CRM</span></span><div class="shield">🛡️ AES-256</div><span class="cnt">${C.length}</span>${syncDot}</div><div style="display:flex;gap:6px">${tab==='list'&&vw==='list'?`<button class="btn btn-s" id="sB" style="padding:5px 9px;font-size:13px">⚙️</button><button class="btn btn-g" id="aB" style="padding:7px 12px">+ Nouveau</button>`:''}</div></div>`;
+  h+=`<div class="hdr"><div class="hdr-l"><span class="brand">My<span>CRM</span></span><div class="shield">🛡️ AES-256</div><span class="cnt">${C.length}</span>${syncDot}</div><div style="display:flex;gap:6px">${tab==='list'&&vw==='list'?`<button class="btn btn-s" id="sB" style="padding:5px 9px;font-size:13px">⚙️</button><button class="btn btn-g" id="aB" style="padding:7px 12px">+ Nouveau</button>`:''}</div></div>`;
   h+=rSettings()+rImpModal()+rTfaModal()+rChpwModal();
   if(tab==='list'&&vw==='list')h+=rList();else if(tab==='list'&&vw==='detail')h+=rDetail();else if(tab==='list'&&vw==='form')h+=rForm();else if(tab==='dash')h+=rDash();
   h+=`<div class="nav"><div class="nav-item ${tab==='list'?'act':''}" data-tab="list"><div class="ni">👥</div>Contacts</div><div class="nav-item ${tab==='dash'?'act':''}" data-tab="dash"><div class="ni">📊</div>Dashboard</div></div>`;
@@ -329,7 +351,7 @@ function rSettings(){const conf=getSyncConf(),hasSy=conf.url&&conf.code,hasTfa=!
   return`<div class="sov ${stg?'':'hide'}" id="sO"><div class="span"><div class="shandle"></div><div style="font-size:15px;font-weight:700;color:var(--t1);margin-bottom:14px">⚙️ Paramètres</div>
     <div class="sec-box"><div class="sec-box-title" style="color:var(--g)">🔐 Sécurité</div>
       <div style="font-size:11px;color:var(--t3);margin-bottom:8px">Chiffrement AES-256-GCM • PBKDF2 200k itérations</div>
-      <button class="btn btn-s" id="chP" style="width:100%;padding:10px;margin-bottom:6px">🔑 Changer le mot de passe</button>
+      <button class="btn btn-s" id="chP" style="width:100%;padding:10px;margin-bottom:6px">🔑 Changer le code</button>
       <div style="font-size:12px;color:var(--t2);margin:10px 0 6px">${hasTfa?'<span style="color:var(--g);font-weight:700">🛡️ 2FA activé</span>':'2FA non activé'}</div>
       ${hasTfa?`<button class="btn btn-r" id="tfa2Off" style="width:100%;padding:10px">Désactiver 2FA</button>`:`<button class="btn btn-g" id="tfa2On" style="width:100%;padding:10px">🔑 Activer 2FA</button>`}
     </div>
@@ -346,7 +368,7 @@ function rSettings(){const conf=getSyncConf(),hasSy=conf.url&&conf.code,hasTfa=!
   </div></div>`}
 
 function rChpwModal(){if(!chpwModal)return'<div class="modal hide"></div>';
-  return`<div class="modal" id="chpwMod"><div class="modal-box"><div style="font-size:36px;text-align:center;margin-bottom:10px">🔑</div><h3 style="font-size:15px;font-weight:700;color:var(--t1);text-align:center;margin-bottom:14px">${chpwStep===0?'Mot de passe actuel':chpwStep===1?'Nouveau (8+ car.)':'Confirmer'}</h3><input class="modal-inp" id="chpwInp" type="password" placeholder="${chpwStep===0?'Actuel':chpwStep===1?'Nouveau':'Confirmer'}" autocomplete="off"><div class="modal-err" id="chpwErr"></div><div style="display:flex;gap:8px"><button class="btn btn-o" id="chpwCancel" style="flex:1;padding:10px">Annuler</button><button class="btn btn-g" id="chpwOk" style="flex:1;padding:10px">${chpwStep===2?'✅ Changer':'→'}</button></div></div></div>`}
+  return`<div class="modal" id="chpwMod"><div class="modal-box"><div style="font-size:36px;text-align:center;margin-bottom:10px">🔑</div><h3 style="font-size:15px;font-weight:700;color:var(--t1);text-align:center;margin-bottom:14px">${chpwStep===0?'Code actuel':chpwStep===1?'Nouveau code (8+ car.)':'Confirmer'}</h3><input class="modal-inp" id="chpwInp" type="password" placeholder="${chpwStep===0?'Actuel':chpwStep===1?'Nouveau':'Confirmer'}" autocomplete="off"><div class="modal-err" id="chpwErr"></div><div style="display:flex;gap:8px"><button class="btn btn-o" id="chpwCancel" style="flex:1;padding:10px">Annuler</button><button class="btn btn-g" id="chpwOk" style="flex:1;padding:10px">${chpwStep===2?'✅ Changer':'→'}</button></div></div></div>`}
 
 function rTfaModal(){if(!tfaModal)return'<div class="modal hide" id="tfaModX"></div>';const s=tfaSetupSecret;
   return`<div class="modal" id="tfaMod"><div class="modal-box" style="text-align:center"><div style="font-size:40px;margin-bottom:10px">🔑</div><h3 style="font-size:16px;font-weight:700;color:var(--t1);margin-bottom:6px">Google Authenticator</h3><div class="tfa-qr"><img src="${getQRURL(s)}" alt="QR"></div><p style="font-size:11px;color:var(--t4);margin:6px 0">Clé manuelle :</p><div class="tfa-secret">${s.match(/.{1,4}/g).join(' ')}</div><p style="font-size:12px;color:var(--t1);font-weight:600;margin:10px 0 4px">Vérifie :</p><input class="modal-inp" id="tfaVInp" type="tel" maxlength="6" placeholder="000000" inputmode="numeric" style="text-align:center;font-size:24px;letter-spacing:10px;-webkit-text-security:none"><div class="modal-err" id="tfaVErr"></div><div style="display:flex;gap:8px"><button class="btn btn-o" id="tfaCancel" style="flex:1;padding:10px">Annuler</button><button class="btn btn-g" id="tfaConfirm" style="flex:1;padding:10px">✅ Activer</button></div></div></div>`}
@@ -416,7 +438,7 @@ async function doChpw(){
   else if(chpwStep===1){if(val.length<8){if(err)err.textContent='Min 8 car.';return}newPW=val;chpwStep=2;ra();setTimeout(()=>document.getElementById('chpwInp')?.focus(),100)}
   else if(chpwStep===2){if(val!==newPW){if(err)err.textContent='❌ Différent';inp.value='';return}
     masterPW=val;const salt=getSalt();const h=await hashPW(val,salt);localStorage.setItem(HK,h);await saveVault(C);if(totpSecret)await saveTOTP(totpSecret);
-    chpwModal=false;newPW='';chpwStep=0;tt('✅ Mot de passe changé');ra()}
+    chpwModal=false;newPW='';chpwStep=0;tt('✅ Code changé');ra()}
 }
 
 init();
