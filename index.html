@@ -285,9 +285,17 @@ async function init(){
     try{const r=await fetch(conf.url.replace(/\/$/,'')+'/auth/'+encodeURIComponent(conf.code)+'.json');if(r.ok){const d=await r.json();if(d?.h){setLocalLoginHash(d.h);if(d.salt)localStorage.setItem('crm_login_salt',d.salt)}}}catch(e){}
   }
   const hasV=!!getHash();const hasL=hasLogin();
-  if(hasV&&hasL){pm='login';showScreen('scrLogin');focusEl('loginInp')}
-  else if(hasV&&!hasL){pm='pw_unlock';showScreen('scrPW');setupNumpad('numpad');focusEl('pwInp')}
-  else{
+  if(hasL){
+    // Login exists → always show login first
+    pm='login';showScreen('scrLogin');focusEl('loginInp');
+  } else if(hasV&&!hasL){
+    // Vault exists but no login hash → need Firebase to pull it
+    pm='sync_for_login';showScreen('scrSetupFB');focusEl('setupFBUrl');
+    // Pre-fill if config already exists
+    if(conf.url){const u=document.getElementById('setupFBUrl');if(u)u.value=conf.url}
+    if(conf.code){const c=document.getElementById('setupFBCode');if(c)c.value=conf.code}
+  } else {
+    // No vault = new user
     if(conf.url&&conf.code){pm='setup_login';showScreen('scrSetupLogin');focusEl('sLoginInp')}
     else{pm='setup_fb';showScreen('scrSetupFB');focusEl('setupFBUrl')}
   }
@@ -329,7 +337,10 @@ function bindLock(){
   Q('#pwSkip',e=>e.onclick=()=>{pm='setup_pw';showScreen('scrSetupPW');setupNumpad('numpad2');focusEl('sPWInp');document.getElementById('sPWT').textContent='Créer un code';document.getElementById('sPWS').textContent='Choisis un code d\'accès'});
   // Setup FB
   Q('#setupFBBtn',e=>e.onclick=doSetupFB);
-  Q('#setupFBSkip',e=>e.onclick=()=>{pm='setup_login';showScreen('scrSetupLogin');focusEl('sLoginInp')});
+  Q('#setupFBSkip',e=>e.onclick=()=>{
+    if(pm==='sync_for_login'){pm='pw_unlock';showScreen('scrPW');setupNumpad('numpad');focusEl('pwInp')}
+    else{pm='setup_login';showScreen('scrSetupLogin');focusEl('sLoginInp')}
+  });
   // Setup Login
   const slI=document.getElementById('sLoginInp'),slB=document.getElementById('sLoginBtn');
   if(slI)slI.onkeydown=e=>{if(e.key==='Enter')doSetupLogin()};
@@ -378,10 +389,13 @@ async function doPWUnlock(){
 }
 
 // === SETUP FB ===
-function doSetupFB(){
+async function doSetupFB(){
   const url=document.getElementById('setupFBUrl')?.value?.trim(),code=document.getElementById('setupFBCode')?.value?.trim();
   if(!url||!code){document.getElementById('setupFBM').textContent='Les deux champs sont requis';return}
   setSyncConf({url,code});
+  // Try to pull existing login from Firebase
+  try{const r=await fetch(url.replace(/\/$/,'')+'/auth/'+encodeURIComponent(code)+'.json');if(r.ok){const d=await r.json();if(d?.h){setLocalLoginHash(d.h);if(d.salt)localStorage.setItem('crm_login_salt',d.salt);pm='login';showScreen('scrLogin');focusEl('loginInp');return}}}catch(e){}
+  // No login in Firebase → create one
   pm='setup_login';showScreen('scrSetupLogin');focusEl('sLoginInp');
 }
 
@@ -474,7 +488,7 @@ function rSettings(){const conf=getSyncConf(),hasSy=conf.url&&conf.code,hasTfa=!
       <button class="btn btn-r" id="loadLogs" style="width:100%;padding:10px;margin-bottom:8px;background:var(--r2);border:1px solid var(--r3)">📋 Charger le journal</button>
       <div id="logList" style="max-height:250px;overflow-y:auto"></div></div>
     <div class="sync-box"><div class="sync-title">☁️ Sync (chiffré)</div><div class="sync-status"><div class="sync-dot ${hasSy?(syncState==='synced'?'sync-on':'sync-off'):'sync-off'}"></div><span style="font-size:12px;color:var(--t2)">${sTxt}</span></div>
-      <div class="fg" style="margin-bottom:8px"><label class="flab">URL Firebase</label><input class="finp" id="syUrl" value="${E(conf.url||'')}" placeholder="https://xxx.firebaseio.com"></div>
+      <div class="fg" style="margin-bottom:8px"><label class="flab">URL </label><input class="finp" id="syUrl" value="${E(conf.url||'')}" placeholder="https://xxx.firebaseio.com"></div>
       <div class="fg" style="margin-bottom:8px"><label class="flab">Code sync</label><input class="finp" id="syCode" value="${E(conf.code||'')}" placeholder="code"></div>
       <div style="display:flex;gap:6px"><button class="btn btn-b" id="sySave" style="flex:1;padding:10px">💾</button>${hasSy?`<button class="btn btn-g" id="sySync" style="flex:1;padding:10px">🔄 Sync</button>`:''}</div></div>
     <button class="btn btn-s" id="impTg" style="width:100%;margin-top:10px;padding:10px">📱 Telegram</button>
