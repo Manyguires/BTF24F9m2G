@@ -99,7 +99,7 @@ select{-webkit-appearance:none}::-webkit-scrollbar{width:0;height:0}
 </head>
 <body>
 <div class="lock" id="lock">
-  <div id="pinScreen"><div style="font-size:52px;margin-bottom:18px">📱</div><h2 id="lT">Entrer le code PIN</h2><p id="lS">Accès protégé</p><div class="pw-wrap" id="pwWrap"><input class="pw-inp" id="pwInp" type="password" autocomplete="off" placeholder="Code d'accès"><div class="pw-cnt no" id="pwCnt">0</div></div><div class="numpad" id="numpad"></div><div class="lock-msg" id="lM"></div><button class="btn btn-g" id="lBtn" style="margin-top:14px;padding:10px 30px">Déverrouiller</button></div>
+  <div id="pinScreen"><div style="font-size:52px;margin-bottom:18px">📱</div><h2 id="lT">Entrer le code PIN</h2><p id="lS">Accès protégé</p><div class="pw-wrap" id="pwWrap"><input class="pw-inp" id="pwInp" type="password" autocomplete="off" placeholder="Code d'accès"><div class="pw-cnt no" id="pwCnt">0</div></div><div class="numpad" id="numpad"></div><div class="lock-msg" id="lM"></div><button class="btn btn-g" id="lBtn" style="margin-top:14px;padding:10px 30px">Déverrouiller</button><button class="btn btn-o" id="lSkip" style="margin-top:10px;padding:8px 20px;display:none;font-size:11px">Code oublié → créer un nouveau</button></div>
   <div class="totp-screen" id="totpScreen"><div style="font-size:52px;margin-bottom:14px">🔑</div><h2 style="color:var(--t1);margin-bottom:2px">2FA</h2><p style="color:var(--t3);font-size:12px;margin-bottom:6px">Code Google Authenticator</p><div class="totp-bar"><div class="totp-bar-fill" id="totpBar"></div></div><div class="totp-timer">Expire dans <span id="totpTime">30</span>s</div><input class="totp-input" id="totpInp" type="tel" maxlength="6" placeholder="000000" inputmode="numeric"><div class="totp-err" id="totpErr"></div><button class="btn btn-g" id="totpBtn" style="padding:10px 30px">Vérifier</button></div>
 </div>
 <div id="app"></div>
@@ -236,9 +236,11 @@ function rl(){
   document.getElementById('lS').textContent=isV?'Vérifie ton identité':isS?'Choisis un code d\'accès':isC?'Retapez le code':'Accès protégé';
   const msg=document.getElementById('lM');msg.textContent=pe;msg.className='lock-msg'+(pe?' err':'');
   document.getElementById('lBtn').textContent=isV?'Vérifier':isS?'Suivant':isC?'Confirmer':'OK';
+  const skipEl=document.getElementById('lSkip');if(skipEl){skipEl.style.display=isV?'block':'none';skipEl.onclick=()=>{pm='setup';pe='';rl()}}
+  document.getElementById('lBtn').onclick=pwSubmit;
   const pad=document.getElementById('numpad');pad.innerHTML='';
   [1,2,3,4,5,6,7,8,9,'*',0,'⌫'].forEach(n=>{const b=document.createElement('div');b.className='nk';b.textContent=n;if(n==='⌫'){b.style.fontSize='18px';b.onclick=()=>{const inp=document.getElementById('pwInp');if(inp){inp.value=inp.value.slice(0,-1);inp.dispatchEvent(new Event('input'));updatePwCnt()}}}else{b.onclick=()=>{const inp=document.getElementById('pwInp');if(inp){inp.value+=String(n);inp.dispatchEvent(new Event('input'));updatePwCnt()}}};pad.appendChild(b)});
-  const inp=document.getElementById('pwInp');inp.value='';inp.placeholder=isV?'Ancien code':'Code d\'accès';inp.focus();updatePwCnt();
+  const inp=document.getElementById('pwInp');inp.value='';inp.placeholder=isV?'Ancien code':'Code d\'accès';inp.oninput=updatePwCnt;inp.onkeydown=e=>{if(e.key==='Enter')pwSubmit()};inp.focus();updatePwCnt();
 }
 function updatePwCnt(){const inp=document.getElementById('pwInp'),cnt=document.getElementById('pwCnt');if(!inp||!cnt)return;const l=inp.value.length;cnt.textContent=l;cnt.className='pw-cnt '+(l>=8?'ok':'no')}
 
@@ -384,6 +386,7 @@ function drawMini(){const c=C.find(x=>x.id===sid);if(!c)return;const mo=(c.month
 function bindAll(){
   const pwI=document.getElementById('pwInp');if(pwI){pwI.oninput=updatePwCnt;pwI.onkeydown=e=>{if(e.key==='Enter')pwSubmit()}}
   Q('#lBtn',e=>e.onclick=pwSubmit);
+  Q('#lSkip',e=>e.onclick=()=>{pm='setup';pe='';rl()});
   const tI=document.getElementById('totpInp');if(tI){tI.value='';tI.oninput=()=>{tI.value=tI.value.replace(/\D/g,'').slice(0,6);if(tI.value.length===6)doTotpVerify()}}
   Q('#totpBtn',e=>e.onclick=doTotpVerify);
   document.querySelectorAll('.nav-item').forEach(n=>n.onclick=()=>{tab=n.dataset.tab;vw=tab==='dash'?'dash':'list';sid=null;ra()});
