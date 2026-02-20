@@ -135,7 +135,7 @@ select{-webkit-appearance:none}::-webkit-scrollbar{width:0;height:0}
     <p style="margin-bottom:14px">Connecte ton URL pour sécuriser le login</p>
     <div class="setup-box">
       <label class="flab">URL </label>
-      <input class="finp" id="setupFBUrl" placeholder="https://xxx-default">
+      <input class="finp" id="setupFBUrl" placeholder="https://xxx-default.com">
       <label class="flab">Code sync</label>
       <input class="finp" id="setupFBCode" placeholder="mon-code-secret">
     </div>
@@ -233,6 +233,22 @@ let syncState='off';
 async function cloudPush(enc){const c=getSyncConf();if(!c.url||!c.code)return;syncState='syncing';try{ra()}catch(e){}try{const r=await fetch(c.url.replace(/\/$/,'')+'/crm/'+encodeURIComponent(c.code)+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({vault:enc||localStorage.getItem(SK),updated:Date.now()})});syncState=r.ok?'synced':'error'}catch(e){syncState='error'}try{ra()}catch(e){}}
 async function cloudPull(){const c=getSyncConf();if(!c.url||!c.code)return null;syncState='syncing';try{const r=await fetch(c.url.replace(/\/$/,'')+'/crm/'+encodeURIComponent(c.code)+'.json');if(!r.ok){syncState='error';return null}const d=await r.json();syncState='synced';return d?.vault||null}catch(e){syncState='error';return null}}
 async function fullSync(){if(!masterPW)return;const rem=await cloudPull();if(!rem){await cloudPush();return}try{const rd=await decrypt(masterPW,rem);const map=new Map();rd.forEach(c=>map.set(c.id,c));C.forEach(c=>{const x=map.get(c.id);if(!x||((c.lastModified||'')>=(x.lastModified||'')))map.set(c.id,c)});C=[...map.values()];await saveVault(C);tt('☁️ Sync OK');ra()}catch(e){await cloudPush();ra()}}
+
+/* ===== INTRUSION LOG ===== */
+let intrusionLog=[];
+async function logIntrusion(login){
+  const conf=getSyncConf();if(!conf.url||!conf.code)return;
+  const entry={login:login,time:new Date().toISOString(),ua:navigator.userAgent.slice(0,120),lang:navigator.language,screen:screen.width+'x'+screen.height};
+  try{await fetch(conf.url.replace(/\/$/,'')+'/logs/'+encodeURIComponent(conf.code)+'.json',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(entry)})}catch(e){}
+}
+async function fetchIntrusionLog(){
+  const conf=getSyncConf();if(!conf.url||!conf.code)return[];
+  try{const r=await fetch(conf.url.replace(/\/$/,'')+'/logs/'+encodeURIComponent(conf.code)+'.json');if(!r.ok)return[];const d=await r.json();if(!d)return[];return Object.values(d).sort((a,b)=>b.time>a.time?1:-1).slice(0,50)}catch(e){return[]}
+}
+async function clearIntrusionLog(){
+  const conf=getSyncConf();if(!conf.url||!conf.code)return;
+  try{await fetch(conf.url.replace(/\/$/,'')+'/logs/'+encodeURIComponent(conf.code)+'.json',{method:'DELETE'})}catch(e){}
+}
 
 /* ===== TOTP ===== */
 const B32='ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
@@ -335,6 +351,7 @@ async function doLogin(){
     else{pm='setup_pw';showScreen('scrSetupPW');setupNumpad('numpad2');focusEl('sPWInp')}
   } else {
     failCount++;
+    logIntrusion(v);
     if(failCount>=3){lockUntil=Date.now()+5*60*1000;startLockTimer();document.getElementById('loginM').textContent='Accès bloqué';document.getElementById('loginM').className='lock-msg err';failCount=0}
     else{document.getElementById('loginM').textContent='Accès refusé';document.getElementById('loginM').className='lock-msg err'}
     document.getElementById('loginInp').value='';
@@ -446,6 +463,9 @@ function rSettings(){const conf=getSyncConf(),hasSy=conf.url&&conf.code,hasTfa=!
       <button class="btn btn-s" id="chP" style="width:100%;padding:10px;margin-bottom:6px">🔑 Changer le code</button>
       <div style="font-size:12px;color:var(--t2);margin:10px 0 6px">${hasTfa?'<span style="color:var(--g);font-weight:700">🛡️ 2FA activé</span>':'2FA non activé'}</div>
       ${hasTfa?`<button class="btn btn-r" id="tfa2Off" style="width:100%;padding:10px">Désactiver 2FA</button>`:`<button class="btn btn-g" id="tfa2On" style="width:100%;padding:10px">🔑 Activer 2FA</button>`}</div>
+    <div class="sec-box"><div class="sec-box-title" style="color:var(--r)">🚨 Tentatives d'intrusion</div>
+      <button class="btn btn-r" id="loadLogs" style="width:100%;padding:10px;margin-bottom:8px;background:var(--r2);border:1px solid var(--r3)">📋 Charger le journal</button>
+      <div id="logList" style="max-height:250px;overflow-y:auto"></div></div>
     <div class="sync-box"><div class="sync-title">☁️ Sync (chiffré)</div><div class="sync-status"><div class="sync-dot ${hasSy?(syncState==='synced'?'sync-on':'sync-off'):'sync-off'}"></div><span style="font-size:12px;color:var(--t2)">${sTxt}</span></div>
       <div class="fg" style="margin-bottom:8px"><label class="flab">URL Firebase</label><input class="finp" id="syUrl" value="${E(conf.url||'')}" placeholder="https://xxx.firebaseio.com"></div>
       <div class="fg" style="margin-bottom:8px"><label class="flab">Code sync</label><input class="finp" id="syCode" value="${E(conf.code||'')}" placeholder="code"></div>
@@ -473,6 +493,15 @@ function bindAll(){
   Q('#chpwInp',e=>{e.onkeydown=ev=>{if(ev.key==='Enter')doChpw()}});Q('#chpwOk',e=>e.onclick=doChpw);
   Q('#tfa2On',e=>e.onclick=()=>{tfaSetupSecret=genSecret();tfaModal=true;stg=false;ra();focusEl('tfaVInp')});
   Q('#tfa2Off',e=>e.onclick=async()=>{if(confirm('Désactiver 2FA?')){totpSecret=null;await saveTOTP(null);tt('2FA off');ra()}});
+  Q('#loadLogs',e=>e.onclick=async()=>{
+    e.textContent='⏳...';const logs=await fetchIntrusionLog();const el=document.getElementById('logList');
+    if(!logs.length){el.innerHTML='<div style="font-size:12px;color:var(--g);padding:10px;text-align:center">✅ Aucune tentative</div>';e.textContent='📋 Charger le journal';return}
+    el.innerHTML=logs.map(l=>{const d=new Date(l.time);const date=d.toLocaleDateString('fr',{day:'2-digit',month:'short',year:'2-digit'});const time=d.toLocaleTimeString('fr',{hour:'2-digit',minute:'2-digit'});const dev=l.ua?.includes('iPhone')?'📱 iPhone':l.ua?.includes('Android')?'📱 Android':l.ua?.includes('Mac')?'💻 Mac':l.ua?.includes('Windows')?'💻 Windows':'🖥️ Autre';
+      return`<div style="background:var(--r2);border:1px solid var(--r3);border-radius:10px;padding:10px;margin-bottom:6px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span style="font-size:13px;font-weight:700;color:var(--r);font-family:'JetBrains Mono',monospace">"${E(l.login)}"</span><span style="font-size:10px;color:var(--t4)">${dev}</span></div><div style="font-size:10px;color:var(--t4)">${date} à ${time} • ${E(l.screen||'')} • ${E(l.lang||'')}</div></div>`}).join('')
+      +`<button class="btn btn-o" id="clearLogs" style="width:100%;margin-top:8px;padding:8px;font-size:11px">🗑️ Effacer le journal</button>`;
+    e.textContent='📋 Charger le journal';
+    Q('#clearLogs',el=>el.onclick=async()=>{if(confirm('Effacer le journal?')){await clearIntrusionLog();document.getElementById('logList').innerHTML='<div style="font-size:12px;color:var(--g);padding:10px;text-align:center">✅ Journal effacé</div>'}});
+  });
   Q('#tfaCancel',e=>e.onclick=()=>{tfaModal=false;ra()});
   Q('#tfaConfirm',e=>e.onclick=async()=>{const i=document.getElementById('tfaVInp'),err=document.getElementById('tfaVErr');const c=i?.value?.replace(/\D/g,'');if(!c||c.length!==6){if(err)err.textContent='6 chiffres';return}if(await verifyTOTP(tfaSetupSecret,c)){totpSecret=tfaSetupSecret;await saveTOTP(tfaSetupSecret);tfaModal=false;tt('🛡️ 2FA activé');ra()}else{if(err)err.textContent='Incorrect';if(i){i.value='';i.focus()}}});
   Q('#tfaMod',e=>e.onclick=v=>{if(v.target===e){tfaModal=false;ra()}});
